@@ -105,7 +105,7 @@ class BlxRobotArm(object):
         if current_pose:
             joint_angle_list = self.get_joint_angle_all().get('data')
         else:
-            joint_angle_list = list(*args)
+            joint_angle_list = list(args)
             
         if joint_angle_list:
             # 提取机械臂角度值
@@ -113,7 +113,7 @@ class BlxRobotArm(object):
             arm_pose_degrees = np.array(arm_pose_list)
             # 计算机械臂正解
             translation_vector = self.robot.fkine(arm_pose_degrees)
-            x, y, z = translation_vector.t  # 平移向量
+            x, y, z = map(lambda t_data: round(t_data, 2), translation_vector.t)  # 平移向量
             Rz, Ry, Rx = map(lambda x: degrees(x), translation_vector.rpy())  # 旋转角
             positive_solution = json.dumps({"command": "get_positive_solution", "data": [x, y, z, Rx, Ry, Rz]})
             return positive_solution
@@ -122,9 +122,13 @@ class BlxRobotArm(object):
             positive_solution = json.dumps({"command": "get_positive_solution", "data": []})
             return positive_solution
 
-    def get_inverse_solution(self):
-        """获取机械臂逆解"""
-        pass
+    def get_inverse_solution(self, *args, current_pose=False):
+        """获取机械臂逆解
+        :params *args: 机械臂x，y，z，Rx，Ry，Rz
+        :params current_pose: 是否使用当前机械臂关节角度值
+        """
+        x, y, z, Rx, Ry, Rz = args
+        
 
     def set_robot_io_interface(self, io, status):
         """设置机械臂IO口状态
@@ -155,5 +159,5 @@ if __name__ == "__main__":
     # print(blx_robot_arm.set_joint_angle_all_speed(50,50,50,50,50,50, speed=50))
     # time.sleep(2)
 
-    print(blx_robot_arm.get_positive_solution(45, 90, 45, 90, 45, 90, current_pose=True))
+    print(blx_robot_arm.get_positive_solution(0, 20, 0, 0, 0, 0, current_pose=False))
     

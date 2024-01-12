@@ -9,45 +9,55 @@ class Mirobot(DHRobot):
     """比邻星机械臂模型"""
 
     def __init__(self):
-        L0 = RevoluteMDH(
-            d=143.5,
+        L1 = RevoluteMDH(
+            alpha=0,
+            a=0,
+            d=0.1435,
             qlim=[radians(-165), radians(165)],
             )
-        L1 = RevoluteMDH(
-            a=59.50, 
+        L2 = RevoluteMDH(
             alpha=-pi/2, 
+            a=0.02969,
+            d=0, 
             offset=-pi/2,
             qlim=[radians(-90), radians(90)],
             )
-        L2 = RevoluteMDH(
-            a=160.72,
+        L3 = RevoluteMDH(
+            alpha=0,
+            a=0.16072,
+            d=0,
+            # offset=-pi/2,
             qlim=[radians(-60), radians(60)],
             )
-        L3 = RevoluteMDH(
-            d=238.67, 
-            a=59.50,
+        L4 = RevoluteMDH(
             alpha=-pi/2,
+            a=0.02,
+            d=0.23837,
+            # offset=pi/2,
             qlim=[radians(-150), radians(170)],
             )
-        L4 = RevoluteMDH(
+        L5 = RevoluteMDH(
             alpha=pi/2, 
+            a=0,
+            d=0,
             offset=pi/2,
             qlim=[radians(-30), radians(210)],
             )
-        L5 = RevoluteMDH(
-            d=-70.5, 
+        L6 = RevoluteMDH(
             alpha=pi/2,
-            qlim=[radians(-180), radians(180)])
+            a=0,
+            d=-0.07079, 
+            qlim=[radians(-90), radians(180)])
         
         super().__init__(
-            [L0, L1, L2, L3, L4, L5],
-            name="mirobot",
-            manufacturer="BLinx"
+            [L1, L2, L3, L4, L5, L6],
+            name="Blinx_six_arm_robot",
+            manufacturer="RenWeiMing"
         )
         
         self._MYCONFIG = np.array([1, 2, 3, 4, 5, 6])
-        self.qr = np.array([0, radians(90), radians(90), 0, 0, 0])
-        self.qz = np.zeros(6)
+        self.qr = np.array([radians(150), radians(70), radians(45), radians(150), radians(10), radians(0)])
+        self.qz = np.array([radians(0), radians(0), radians(0), radians(0), radians(0), radians(0)])
         self.addconfiguration("qr", self.qr)
         self.addconfiguration("qz", self.qz)
 
@@ -86,12 +96,27 @@ if __name__ == "__main__":
     
     # 机器人逆运动解
     # 给出符合逆解条件的末端坐标 T 值
+    
     print("机械臂逆解结果")
-    R_T = SE3([round(x, 2), round(y, 2), round(z, 2)]) * rpy2tr([round(Rz, 2), round(Ry, 2), round(Rx, 2)], unit='deg')
-    sol = mirobot.ikine_LM(R_T, joint_limits=True)
+    rs_ik = []
+    for i, _ in enumerate(range(10)):
+        R_T = SE3([x, y, z]) * rpy2tr([Rz, Ry, Rx], unit='deg')
+        sol = mirobot.ikine_LM(R_T, joint_limits=True)
 
-    def get_value(number):
-        res = round(degrees(number), 2)
-        return res
+        def get_value(number):
+            res = round(degrees(number), 2)
+            return res
 
-    print(list(map(get_value, sol.q)))
+        print(f"第{i + 1}次：", list(map(get_value, sol.q)))
+        rs_ik.append(list(map(get_value, sol.q)))
+    
+    # 统计出逆解数据列表数据中，指定数据出现的次数
+    # 指定的数据为 [150.0, 70.0, 45.0, 150.0, 10.0, 0.0]
+    rs_ik  # Assuming rs_ik is the inverse solution data list
+    specified_data = [150.0, 70.0, 45.0, 150.0, 10.0, 0.0]
+    occurrences = rs_ik.count(specified_data)
+    print("Occurrences:", occurrences)
+    
+    # 机械臂画图
+    mirobot.plot(mirobot.qz, block=True)
+    

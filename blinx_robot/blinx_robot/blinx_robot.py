@@ -1,7 +1,5 @@
-from functools import wraps
 import socket
 import json
-import time
 
 from loguru import logger
 import numpy as np
@@ -30,9 +28,10 @@ class ClientSocket:
         except Exception as e:
             logger.error("连接失败!失败原因：{}".format(e))
         return self.client
-
+    
 
 class BlxRobotArm(object):
+    """比邻星六轴机械臂 API"""
     def __init__(self, host, port):
         self.host = host
         self.port = port
@@ -46,6 +45,7 @@ class BlxRobotArm(object):
         command = json.dumps({"command": "set_joint_Auto_zero"}).replace(' ', "").strip() + '\r\n'
         self.client.send(command.encode('utf-8'))
         data = json.loads(self.client.recv(1024).decode())
+        self.client.close()
         return data
 
     def set_joint_angle(self, axle, angle):
@@ -56,6 +56,7 @@ class BlxRobotArm(object):
         command = json.dumps({"command": "set_joint_angle", "data": [axle, angle]}).replace(' ', "").strip() + '\r\n'
         self.client.send(command.encode('utf-8'))
         data = json.loads(self.client.recv(1024).decode())
+        self.client.close()
         return data
     
     def set_joint_angle_speed(self, axle, angle, speed=50):
@@ -67,6 +68,7 @@ class BlxRobotArm(object):
         command = json.dumps({"command": "set_joint_angle_speed", "data": [axle, angle, speed]}).replace(' ', "").strip() + '\r\n'
         self.client.send(command.encode('utf-8'))
         data = json.loads(self.client.recv(1024).decode())
+        self.client.close()
         return data
 
     def set_joint_angle_all_speed(self, *args, speed=50):
@@ -83,6 +85,7 @@ class BlxRobotArm(object):
         command = json.dumps({"command": "set_joint_angle_all_speed", "data": six_angle}).replace(' ', "").strip() + '\r\n'
         self.client.send(command.encode('utf-8'))
         data = json.loads(self.client.recv(1024).decode())
+        self.client.close()
         return data
 
     def get_positive_solution(self, *args, current_pose=False):
@@ -102,10 +105,12 @@ class BlxRobotArm(object):
             x, y, z = np.round(translation_vector.t, 3)  # 平移向量
             Rx, Ry, Rz = np.round(translation_vector.rpy(unit="deg", order="xyz"), 3)  # 旋转角
             positive_solution = json.dumps({"command": "get_positive_solution", "data": [x, y, z, Rx, Ry, Rz]})
+            self.client.close()
             return positive_solution
         else:
             logger.error("获取机械臂角度值失败!")
             positive_solution = json.dumps({"command": "get_positive_solution", "data": []})
+            self.client.close()
             return positive_solution
 
     def get_inverse_solution(self, *args, current_pose=False):
@@ -159,18 +164,4 @@ class BlxRobotArm(object):
             execute_result = self.set_joint_angle_all_speed(*inverse_solution, speed=speed)
             return execute_result
             
-if __name__ == "__main__":
-    blx_robot_arm = BlxRobotArm("192.168.10.235", 1234)
-    # print(blx_robot_arm.set_joint_auto_zero())
-    # time.sleep(20)
-    # print(blx_robot_arm.set_joint_angle(5, 15))
-    # time.sleep(2)
-    # print(blx_robot_arm.set_joint_angle_speed(1, 0, 30))
-    # time.sleep(2)
-    print(blx_robot_arm.set_joint_angle_all_speed(20,20,20,20,30, speed=20))
-    # time.sleep(2)
-
-    # print(blx_robot_arm.get_positive_solution(5, 0, 0, 0, 0, 0, current_pose=True))
-    # print(blx_robot_arm.get_inverse_solution(current_pose=True))
-    # print(blx_robot_arm.set_coordinate_axle_all_speed(0.238, 0, 0.233, 0, 0, 0, speed=20))
     

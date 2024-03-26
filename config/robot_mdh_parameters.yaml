@@ -1,0 +1,47 @@
+# 第一关节
+- joint: 1
+  alpha: 0
+  a: 0
+  d: 0.1535
+  theta: 0
+  qlim: [-135, 135]
+
+# 第二关节
+- joint: 2
+  alpha: -pi / 2
+  a: 0.024
+  d: 0
+  theta: -pi / 2
+  qlim: [-86, 96]
+
+# 第三关节
+- joint: 3
+  alpha: 0
+  a: 0.16072
+  d: 0
+  theta: 0
+  qlim: [-90, 46]
+
+# 第四关节
+- joint: 4
+  alpha: -pi / 2
+  a: 0
+  d: 0.2205
+  theta: 0
+  qlim: [-143, 184]
+
+# 第五关节
+- joint: 5
+  alpha: pi / 2
+  a: 0
+  d: 0
+  theta: pi / 2
+  qlim: [-219, 36]
+
+# 第六关节
+- joint: 6
+  alpha: pi / 2
+  a: 0
+  d: -0.045
+  theta: 0
+  qlim: [-180, 180]

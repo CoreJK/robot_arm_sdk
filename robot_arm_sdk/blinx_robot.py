@@ -32,17 +32,18 @@ class ClientSocket:
 
 class BlxRobotArm(object):
     """比邻星六轴机械臂 API"""
-    def __init__(self, host, port):
+    def __init__(self, host, port, config_file):
         self.host = host
         self.port = port
+        self.config_file = config_file
         self.client = ClientSocket(self.host, self.port).new_connect()
-        self.robot = Mirobot()
+        self.robot = Mirobot(self.config_file)
 
     def set_joint_auto_zero(self):
         """设置机械臂关节自动归零运动
         :return: {"command": "set_joint_Auto_zero", "data": "true"}
         """
-        command = json.dumps({"command": "set_joint_Auto_zero"}).replace(' ', "").strip() + '\r\n'
+        command = json.dumps({"command": "set_joint_return_to_zero", "data": [0]}).replace(' ', "").strip() + '\r\n'
         self.client.send(command.encode('utf-8'))
         data = json.loads(self.client.recv(1024).decode())
         self.client.close()

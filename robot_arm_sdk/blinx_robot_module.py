@@ -73,7 +73,7 @@ class RobotArmConfig(object):
         return [radians(joint_config.get('qlim')[0]), radians(joint_config.get('qlim')[1])]
     
 
-class Mirobot(DHRobot):
+class BlinxRobotArm(DHRobot):
     """比邻星机械臂模型"""
 
     def __init__(self, robot_module_config_file):
@@ -88,11 +88,11 @@ class Mirobot(DHRobot):
         super().__init__(
             [L1, L2, L3, L4, L5, L6],
             name="Blinx_six_arm_robot",
-            manufacturer="RenWeiMing"
+            manufacturer="任伟明"
         )
         
         self._MYCONFIG = np.array([1, 2, 3, 4, 5, 6])
-        self.qr = np.radians([140, 70, 45, 150, 10, 0])
+        self.qr = np.radians([0, 0, 0, 0, 0, 0])
         self.qz = np.radians([0, 0, 0, 0, 0, 0])
         self.addconfiguration("qr", self.qr)
         self.addconfiguration("qz", self.qz)
@@ -107,19 +107,19 @@ if __name__ == "__main__":
     PROJECT_ROOT_PATH = Path(__file__).absolute().parent.parent
     robot_arm_config_file = PROJECT_ROOT_PATH /  "config/robot_mdh_parameters.yaml"
     
-    mirobot = Mirobot(robot_arm_config_file)
-    print(mirobot)
+    blinx_robot_arm = BlinxRobotArm(robot_arm_config_file)
+    print(blinx_robot_arm)
 
     # 机械臂正运动解
-    q1 = radians(0)
-    q2 = radians(20)
-    q3 = radians(0)
-    q4 = radians(0)
-    q5 = radians(0)
-    q6 = radians(0)
+    q1 = radians(135)
+    q2 = radians(30)
+    q3 = radians(5)
+    q4 = radians(5)
+    q5 = radians(5)
+    q6 = radians(5)
     print("机械臂关节角度 = ", [round(degrees(i), 2) for i in [q1, q2, q3, q4, q5, q6]])
     arm_pose_degree = np.array([q1, q2, q3, q4, q5, q6])
-    translation_vector = mirobot.fkine(arm_pose_degree)
+    translation_vector = blinx_robot_arm.fkine(arm_pose_degree)
 
     print("机械臂正解结果")
     print(translation_vector.printline(), '\n')
@@ -141,21 +141,20 @@ if __name__ == "__main__":
     rs_ik = []
     for i, _ in enumerate(range(10)):
         R_T = SE3([x, y, z]) * rpy2tr([Rz, Ry, Rx], unit='deg')
-        sol = mirobot.ikine_LM(R_T, joint_limits=True)
+        sol = blinx_robot_arm.ikine_LM(R_T, joint_limits=True)
 
         def get_value(number):
-            res = round(degrees(number), 2)
+            res = round(degrees(number), 3)
             return res
 
         print(f"第{i + 1}次：", list(map(get_value, sol.q)))
         rs_ik.append(list(map(get_value, sol.q)))
 
     # 统计出逆解数据列表数据中，指定数据出现的次数
-    # 指定的数据为 [150.0, 70.0, 45.0, 150.0, 10.0, 0.0]
-    specified_data = list(map(lambda d: round(degrees(d), 1), [q1, q2, q3, q4, q5, q6]))
+    specified_data = list(map(lambda d: round(degrees(d), 2), [q1, q2, q3, q4, q5, q6]))
     occurrences = rs_ik.count(specified_data)
     print("Occurrences:", occurrences)
 
     # 机械臂画图
-    mirobot.teach(mirobot.qz, block=True)
+    blinx_robot_arm.teach(blinx_robot_arm.qz, block=True)
     

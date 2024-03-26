@@ -7,7 +7,7 @@ from retrying import retry
 from spatialmath import SE3
 from spatialmath.base import rpy2tr
 
-from blinx_robot_module import Mirobot
+from blinx_robot_module import BlinxRobotArm
 
 
 # 机械臂连接方式
@@ -39,7 +39,7 @@ class BlxRobotArm(object):
         self.port = port
         self.config_file = config_file
         self.client = ClientSocket(self.host, self.port).new_connect()
-        self.robot = Mirobot(self.config_file)
+        self.blinx_robot_arm = BlinxRobotArm(self.config_file)
 
     def set_robot_arm_init(self) -> dict:
         """机械臂初始化，将机械臂关节角度归零
@@ -67,7 +67,7 @@ class BlxRobotArm(object):
         self.client.close()
         return data
 
-    def set_joint_degree_synchronize(self, *args, speed_percentage: int = 20) -> dict:
+    def set_joint_degree_synchronize(self, *args, speed_percentage: int = 50) -> dict:
         """设置机械臂所有关节角度
         :param *args: 机械臂所有关节的角度 q1, q2, q3, q4, q5, q6, 单位:度
         :param speed_percentage: 机械臂关节运动速度百分比 1~100
@@ -137,7 +137,7 @@ class BlxRobotArm(object):
         if joint_angle_list and len(joint_angle_list) == 6:
             # 计算机械臂正解
             arm_joint_radians = np.radians(joint_angle_list)
-            translation_vector = self.robot.fkine(arm_joint_radians)
+            translation_vector = self.blinx_robot_arm.fkine(arm_joint_radians)
             x, y, z = np.round(translation_vector.t, 3)  # 平移向量
             Rx, Ry, Rz = np.round(translation_vector.rpy(
                 unit="deg", order="xyz"), 3)  # 旋转角
@@ -165,7 +165,7 @@ class BlxRobotArm(object):
             x, y, z, Rx, Ry, Rz = list(args)
 
         R_T = SE3([x, y, z]) * rpy2tr([Rz, Ry, Rx], unit='deg')
-        sol = self.robot.ikine_LM(R_T, joint_limits=True)
+        sol = self.blinx_robot_arm.ikine_LM(R_T, joint_limits=True)
         inverse_result = np.round(np.degrees(sol.q), 3).tolist()
 
         try:

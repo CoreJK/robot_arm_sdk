@@ -1,5 +1,5 @@
-import socket
 import json
+import socket
 
 from loguru import logger
 import numpy as np
@@ -39,60 +39,56 @@ class BlxRobotArm(object):
         self.client = ClientSocket(self.host, self.port).new_connect()
         self.robot = Mirobot(self.config_file)
 
-    def set_joint_auto_zero(self):
-        """设置机械臂关节自动归零运动
-        :return: {"command": "set_joint_Auto_zero", "data": "true"}
+
+    def set_joint_return_to_zero(self) -> dict:
+        """机械臂初始化，将机械臂关节角度归零
+        :return: {"command": "set_joint_return_to_zero", "data": "true"}
         """
-        command = json.dumps({"command": "set_joint_return_to_zero", "data": [0]}).replace(' ', "").strip() + '\r\n'
+        payload = [0]
+        command = json.dumps({"command": "set_joint_return_to_zero", "data": payload}).replace(' ', "").strip() + '\r\n'
         self.client.send(command.encode('utf-8'))
         data = json.loads(self.client.recv(1024).decode())
         self.client.close()
         return data
 
-    def set_joint_angle(self, axle, angle):
+    def set_joint_angle(self, joint_number: int, speed_percentage: int, joint_degree: float) -> dict:
         """设置指定的机械臂关节角度
-        :param axle: 机械臂关节
-        :param angle: 机械臂关节角度
+        :param joint_number: 机械臂关节编号 1~6
+        :param speed_percentage: 机械臂关节运动速度百分比 1~100
+        :param joint_degree: 机械臂关节角度, 单位:度
         """
-        command = json.dumps({"command": "set_joint_angle", "data": [axle, angle]}).replace(' ', "").strip() + '\r\n'
+        payload = [joint_number, speed_percentage, joint_degree]
+        command = json.dumps({"command": "set_joint_angle", "data": payload}).replace(' ', "").strip() + '\r\n'
         self.client.send(command.encode('utf-8'))
         data = json.loads(self.client.recv(1024).decode())
         self.client.close()
         return data
     
-    def set_joint_angle_speed(self, axle, angle, speed=50):
-        """设置指定的机械臂关节角度
-        :param axle: 机械臂关节
-        :param angle: 机械臂关节角度
-        :param speed: 机械臂关节运动速度
+    def set_joint_angle_all_time(self, *args, speed_percentage: int=20) -> dict:
+        """设置机械臂所有关节角度
+        :param *args: 机械臂所有关节的角度 [q1, q2, q3, q4, q5, q6], 单位:度
+        :param speed_percentage: 机械臂关节运动速度百分比 1~100
         """
-        command = json.dumps({"command": "set_joint_angle_speed", "data": [axle, angle, speed]}).replace(' ', "").strip() + '\r\n'
-        self.client.send(command.encode('utf-8'))
-        data = json.loads(self.client.recv(1024).decode())
-        self.client.close()
-        return data
-
-    def set_joint_angle_all_speed(self, *args, speed=50):
-        """设置指定的机械臂关节角度
-        :param args: 机械臂关节角度值
-        :param speed: 机械臂关节运动速度
-        """
-        six_angle = list(args)
-        if len(six_angle) != 6:
-            logger.error("机械臂关节角度值必须为 6 个! 当前只传入了 {} 个".format(len(six_angle)))
-            return json.dumps({"command": "set_joint_angle_all_speed", "data": []})
-        
-        six_angle.append(speed)
-        command = json.dumps({"command": "set_joint_angle_all_speed", "data": six_angle}).replace(' ', "").strip() + '\r\n'
-        self.client.send(command.encode('utf-8'))
-        data = json.loads(self.client.recv(1024).decode())
-        self.client.close()
-        return data
-
-    def get_positive_solution(self, *args, current_pose=False):
+        if len(args) == 6:
+            joints_degree = list(args)
+            payload = [speed_percentage]
+            payload.extend(joints_degree)
+            command = json.dumps({"command": "set_joint_angle_all_time", "data": payload}).replace(' ', "").strip() + '\r\n'
+            print(command)
+            self.client.send(command.encode('utf-8'))
+            res = json.loads(self.client.recv(1024).decode())
+            self.client.close()
+            return res
+        else:
+            logger.error("关节超出范围!")
+            return json.dumps({"command": "set_joint_angle_all_time", "status": "false"})
+    
+    def get_positive_solution(self, *args, current_pose=False) -> dict:
         """获取机械臂正解
-        :params args: 机械臂关节角度值
-        :params current_pose: 是否使用当前机械臂关节角度值
+        根据提供的机械臂各个关节的角度，计算出机械臂末端的位置和姿态
+        
+        :params args: 机械臂关节角度值 [q1, q2, q3, q4, q5, q6], 单位:度
+        :params current_pose: 是否使用当前机械臂关节角度值, 默认为 False, False 可以不用提供所有关节角度值
         """
         if current_pose:
             joint_angle_list = self.get_joint_angle_all().get('data')
@@ -105,22 +101,22 @@ class BlxRobotArm(object):
             translation_vector = self.robot.fkine(arm_joint_radians)
             x, y, z = np.round(translation_vector.t, 3)  # 平移向量
             Rx, Ry, Rz = np.round(translation_vector.rpy(unit="deg", order="xyz"), 3)  # 旋转角
-            positive_solution = json.dumps({"command": "get_positive_solution", "data": [x, y, z, Rx, Ry, Rz]})
+            positive_solution = json.loads({"command": "get_positive_solution", "data": [x, y, z, Rx, Ry, Rz]})
             self.client.close()
             return positive_solution
         else:
             logger.error("获取机械臂角度值失败!")
-            positive_solution = json.dumps({"command": "get_positive_solution", "data": []})
+            positive_solution = json.loads({"command": "get_positive_solution", "data": []})
             self.client.close()
             return positive_solution
 
-    def get_inverse_solution(self, *args, current_pose=False):
+    def get_inverse_solution(self, *args, current_pose=False) -> dict:
         """获取机械臂逆解
         :params *args: 机械臂 x, y, z, Rx, Ry, Rz 坐标
         :params current_pose: 是否使用当前机械臂关节角度值
         """
         if current_pose:
-            positive_solution = json.loads(self.get_positive_solution(current_pose=True)).get('data')
+            positive_solution = self.get_positive_solution(current_pose=True).get('data')
             x, y, z, Rx, Ry, Rz = positive_solution
         else:
             x, y, z, Rx, Ry, Rz = list(args)
@@ -131,15 +127,15 @@ class BlxRobotArm(object):
         
         try:
             if len(inverse_result) == 6:
-                return json.dumps({"command": "get_inverse_kinematics", "data": inverse_result})
+                return json.loads({"command": "get_inverse_kinematics", "data": inverse_result})
             else:
                 logger.error("获取机械臂逆解失败!")
-                return json.dumps({"command": "get_inverse_kinematics", "data": []})
+                return json.loads({"command": "get_inverse_kinematics", "data": []})
         except Exception as e:
             logger.error("获取机械臂逆解失败!失败原因：{}".format(e))
-            return json.dumps({"command": "get_inverse_kinematics", "data": []})
+            return json.loads({"command": "get_inverse_kinematics", "data": []})
 
-    def set_robot_io_interface(self, io, status):
+    def set_robot_io_interface(self, io: int, status: bool) -> dict:
         """设置机械臂 IO 口状态
         :param io: 机械臂IO口
         :param status: 机械臂IO口状态
@@ -148,21 +144,23 @@ class BlxRobotArm(object):
         self.client.send(command.encode('utf-8'))
         data = json.loads(self.client.recv(1024).decode())
         return data
-
-    def get_joint_angle_all(self):
+    
+    def set_coordinate_axle_all_speed(self, *args, speed_percentage: int) -> dict:
+        """通过末端工具坐标与姿态，控制机械臂关节运动
+        :param *args: 机械臂末端工具坐标与姿态:[x, y, z, Rx, Ry, Rz]
+        :param speed_percentage: 机械臂关节运动速度百分比 1~100
+        """
+        # 通过末端工具坐标与姿态，计算机械臂逆解
+        inverse_solution = self.get_inverse_solution(*args).get('data')
+        if inverse_solution:
+            # 设置机械臂关节角度
+            execute_result = self.set_joint_angle_all_time(*inverse_solution, speed_percentage=50)
+            return execute_result
+            
+    def get_joint_angle_all(self) -> dict:
         """获取机械臂所有关节角度"""
         command = json.dumps({"command": "get_joint_angle_all"}).replace(' ', "").strip() + '\r\n'
         self.client.send(command.encode('utf-8'))
         data = json.loads(self.client.recv(1024).decode())
         return data
-    
-    def set_coordinate_axle_all_speed(self, *args, speed):
-        """通过末端工具坐标与姿态，控制机械臂关节运动"""
-        # 通过末端工具坐标与姿态，计算机械臂逆解
-        inverse_solution = json.loads(self.get_inverse_solution(*args)).get('data')
-        if inverse_solution:
-            # 设置机械臂关节角度
-            execute_result = self.set_joint_angle_all_speed(*inverse_solution, speed=speed)
-            return execute_result
-            
-    
+

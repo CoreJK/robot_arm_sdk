@@ -1,0 +1,1 @@
+set_joint_degree_synchronize

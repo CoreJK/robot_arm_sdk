@@ -111,12 +111,12 @@ if __name__ == "__main__":
     print(blinx_robot_arm)
 
     # 机械臂正运动解
-    q1 = radians(135)
-    q2 = radians(30)
-    q3 = radians(5)
-    q4 = radians(5)
-    q5 = radians(5)
-    q6 = radians(5)
+    q1 = radians(50)
+    q2 = radians(0)
+    q3 = radians(0)
+    q4 = radians(0)
+    q5 = radians(0)
+    q6 = radians(0)
     print("机械臂关节角度 = ", [round(degrees(i), 2) for i in [q1, q2, q3, q4, q5, q6]])
     arm_pose_degree = np.array([q1, q2, q3, q4, q5, q6])
     translation_vector = blinx_robot_arm.fkine(arm_pose_degree)
@@ -128,10 +128,10 @@ if __name__ == "__main__":
     print("y = ", round(y, 3))
     print("z = ", round(z, 3))
     print('')
-    Rz, Ry, Rx = translation_vector.rpy(unit='deg')  # 旋转角
-    print("r = ", round(Rz, 3))
-    print("p = ", round(Ry, 3))
-    print("y = ", round(Rx, 3))
+    Rx, Py, Yz = translation_vector.rpy(unit='deg', order='zyx')  # 旋转角
+    print("rx = ", round(Rx, 3))
+    print("py = ", round(Py, 3))
+    print("yz = ", round(Yz, 3))
     print("")
 
     # 机器人逆运动解
@@ -140,18 +140,14 @@ if __name__ == "__main__":
     print("机械臂逆解结果")
     rs_ik = []
     for i, _ in enumerate(range(10)):
-        R_T = SE3([x, y, z]) * rpy2tr([Rz, Ry, Rx], unit='deg')
+        R_T = SE3([x, y, z]) * rpy2tr([Rx, Py, Yz], unit='deg', order='zyx')
         sol = blinx_robot_arm.ikine_LM(R_T, joint_limits=True)
 
-        def get_value(number):
-            res = round(degrees(number), 3)
-            return res
-
-        print(f"第{i + 1}次：", list(map(get_value, sol.q)))
-        rs_ik.append(list(map(get_value, sol.q)))
+        print(f"第{i + 1}次：", np.degrees(sol.q).tolist())
+        rs_ik.append(np.round(np.degrees(sol.q), 3).tolist())
 
     # 统计出逆解数据列表数据中，指定数据出现的次数
-    specified_data = list(map(lambda d: round(degrees(d), 2), [q1, q2, q3, q4, q5, q6]))
+    specified_data = np.round(np.degrees([q1, q2, q3, q4, q5, q6]), 3).tolist()
     occurrences = rs_ik.count(specified_data)
     print("Occurrences:", occurrences)
 

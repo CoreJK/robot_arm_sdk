@@ -159,14 +159,9 @@ class BlxRobotArm(object):
 
         R_T = SE3([x, y, z]) * rpy2tr([Rx, Py, Yz], order='zyx')
         sol = self.blinx_robot_arm.ikine_LM(R_T, joint_limits=True)
-        inverse_result = np.round(np.degrees(sol.q), 3).tolist()
-
-        try:
-            if len(inverse_result) == 6:
-                return json.dumps({"command": "get_inverse_kinematics", "data": inverse_result})
-            else:
-                logger.error("获取机械臂逆解失败!")
-                return json.dumps({"command": "get_inverse_kinematics", "data": []})
-        except Exception as e:
-            logger.error("获取机械臂逆解失败!失败原因：{}".format(e))
+        if sol.success:
+            inverse_result = np.round(np.degrees(sol.q), 3).tolist()
+            return json.dumps({"command": "get_inverse_kinematics", "data": inverse_result})
+        else:
+            logger.error("获取机械臂逆解失败!")
             return json.dumps({"command": "get_inverse_kinematics", "data": []})

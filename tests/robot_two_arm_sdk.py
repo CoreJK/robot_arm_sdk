@@ -1,3 +1,4 @@
+import sys
 import serial
 import threading
 import time
@@ -24,7 +25,27 @@ class SerialThread(threading.Thread):
             # 读取返回的数据
             if self.serial.in_waiting:
                 response = self.serial.read(self.serial.in_waiting)
-                print('Received:', response)
+                try:
+                    joints_data = json.loads(response.decode('utf-8')).get('data')
+                    speed = list(joints_data[0])
+                    left_arm = list(joints_data[1])
+                    right_arm = list(joints_data[2])
+
+                    # 将数据记录到数据文件中
+                    record_flag = input("输入 1 记录当前数据: ")
+                    if record_flag == '1':
+                        with open('data.json', 'w') as f:
+                            json.dump({"speed": speed, 
+                                       "left_arm": left_arm, 
+                                       "right_arm": right_arm}, f)
+                    elif record_flag == 'q':
+                        self.stop()
+                        sys.exit(0)
+                    else:
+                        continue
+                    
+                except json.JSONDecodeError:
+                    continue
 
             # 休眠一段时间，以防止 CPU 占用过高
             time.sleep(0.1)

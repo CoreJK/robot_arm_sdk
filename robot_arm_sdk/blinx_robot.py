@@ -37,12 +37,11 @@ class ClientSocket:
 class BlxRobotArm(object):
     """比邻星六轴机械臂 API"""
 
-    def __init__(self, host, port, config_file):
+    def __init__(self, host, port):
         self.host = host
         self.port = port
-        self.config_file = config_file
         self.client = ClientSocket(self.host, self.port)
-        self.blinx_robot_arm = BlinxRobotArm(self.config_file)
+        self.blinx_robot_arm = BlinxRobotArm()
 
     def command_sender(self, command: str) -> dict:
         """发送命令到机械臂

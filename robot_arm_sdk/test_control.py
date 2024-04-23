@@ -2,18 +2,14 @@
 # 测试 SDK 控制机械臂功能的代码
 import time
 from blinx_robot import BlxRobotArm
-from pathlib import Path
 
 
 if __name__ == "__main__":
-    # 读取配置文件
-    PROJECT_ROOT_PATH = Path(__file__).absolute().parent.parent
-    robot_arm_config_file = PROJECT_ROOT_PATH / "config/robot_mdh_parameters.yaml"
     
     # 连接机械臂
     host = "192.168.10.234"
     port = 1234
-    robot = BlxRobotArm(host, port, robot_arm_config_file)
+    robot = BlxRobotArm(host, port)
     
     # 机械臂初始化，将机械臂关节角度归零
     print(robot.set_robot_arm_init())

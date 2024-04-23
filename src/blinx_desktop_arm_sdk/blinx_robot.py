@@ -7,7 +7,7 @@ from retrying import retry
 from spatialmath import SE3
 from spatialmath.base import rpy2tr
 
-from blinx_robot_module import BlinxRobotArm
+from blinx_desktop_arm_sdk.blinx_robot_module import BlinxRobotArm
 
 
 # 机械臂连接方式

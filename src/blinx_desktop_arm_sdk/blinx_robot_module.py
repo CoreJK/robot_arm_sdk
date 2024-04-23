@@ -3,7 +3,6 @@ import numpy as np
 from roboticstoolbox import DHRobot, RevoluteMDH
 
     
-
 class BlinxRobotArm(DHRobot):
     """比邻星机械臂模型"""
 
@@ -66,12 +65,4 @@ class BlinxRobotArm(DHRobot):
     @property
     def MYCONFIG(self):
         return self._MYCONFIG
-
-
-if __name__ == "__main__":
-    blinx_robot_arm = BlinxRobotArm()
-    print(blinx_robot_arm)
-
-    # 机械臂画图
-    blinx_robot_arm.teach(blinx_robot_arm.qz, block=True)
     

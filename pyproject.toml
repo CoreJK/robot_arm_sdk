@@ -1,0 +1,27 @@
+[project]
+name = "blinx_desktop_arm_sdk"
+version = "0.0.1"
+authors = [
+  { name="任伟明", email="coreJK@163.com" },
+]
+description = "比邻星桌面式六轴协作机械臂 SDK"
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "roboticstoolbox-python == 1.1.0",
+    "loguru == 0.5.3",
+    "retrying == 1.3.4",
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: Microsoft :: Windows :: Windows 11",
+]
+
+[project.urls]
+Homepage = "https://gitee.com/blxsoftware/robot_arm_sdk"
+Issues = "https://gitee.com/blxsoftware/robot_arm_sdk/issues"
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # 测试 SDK 控制机械臂功能的代码
 import time
-from blinx_robot import BlxRobotArm
+from blinx_desktop_arm_sdk.blinx_robot_module import BlinxRobotArm
 
 
 if __name__ == "__main__":
@@ -9,7 +9,7 @@ if __name__ == "__main__":
     # 连接机械臂
     host = "192.168.10.234"
     port = 1234
-    robot = BlxRobotArm(host, port)
+    robot = BlinxRobotArm(host, port)
     
     # 机械臂初始化，将机械臂关节角度归零
     print(robot.set_robot_arm_init())

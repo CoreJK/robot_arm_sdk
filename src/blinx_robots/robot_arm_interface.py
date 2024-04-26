@@ -1,55 +1,36 @@
 import json
-import socket
 
-from loguru import logger
 import numpy as np
-from retrying import retry
+from loguru import logger
 from spatialmath import SE3
 from spatialmath.base import rpy2tr
 
-from blinx_desktop_arm_sdk.blinx_robot_module import BlinxRobotArm
-
-
-# 机械臂连接方式
-class ClientSocket:
-    def __init__(self, host, port):
-        super().__init__()
-        self.host = host
-        self.port = port
-        self.client_socket_list = []
-        
-    @retry(stop_max_attempt_number=3, wait_fixed=1000)
-    def new_connect(self):
-        logger.info("正在尝试连接机械臂...")
-        self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.client_socket.connect((self.host, self.port))
-        self.client_socket_list.append(self.client_socket)
-        logger.info("连接成功!")
-        return self.client_socket
-            
-    def __enter__(self):
-        return self.new_connect()
-    
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        self.client_socket_list.pop().close()
+from .robot_arm_module import BlinxRobotArm
 
 
 class BlxRobotArm(object):
     """比邻星六轴机械臂 API"""
 
-    def __init__(self, host, port):
-        self.host = host
-        self.port = port
-        self.client = ClientSocket(self.host, self.port)
+    def __init__(self, communication_strategy):
         self.blinx_robot_arm = BlinxRobotArm()
+        self.communication_strategy = communication_strategy
 
+    def set_communication_strategy(self, communication_strategy):
+        """设置机械臂的不同连接方式"""
+        self.communication_strategy = communication_strategy
+    
+    def start_communication(self):
+        """机械臂开始连接"""
+        # todo 不同的连接策略，需要返回不同的连接对象
+        self.client = self.communication_strategy.connect()
+    
     def command_sender(self, command: str) -> dict:
         """发送命令到机械臂
         :param command: 机械臂命令
         """
-        with self.client as client_socket:
-            client_socket.send(command.encode('utf-8'))
-            data = json.loads(client_socket.recv(1024).decode())
+        # todo 不同的连接策略，发送，接收命令的方式可能不同
+        self.client.send(command.encode('utf-8'))
+        data = json.loads(self.client.recv(1024).decode())
         return data
     
     def set_robot_arm_init(self) -> dict:

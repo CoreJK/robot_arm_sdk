@@ -1,5 +1,5 @@
 [project]
-name = "blinx_desktop_arm_sdk"
+name = "blinx_robots"
 version = "0.0.1"
 authors = [
   { name="任伟明", email="coreJK@163.com" },

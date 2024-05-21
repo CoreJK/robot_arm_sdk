@@ -54,10 +54,10 @@ class BlxRobotArm(object):
         :param command: 机械臂命令
         """
         # 不同的连接策略，发送，接收命令的方式可能不同
-        with self.communication_strategy.connect() as client:
-            while self.thread_work_flag:
-                time.sleep(0.1)
-                if not self.command_queue.empty():
+        while self.thread_work_flag:
+            time.sleep(0.1)
+            if not self.command_queue.empty():
+                with self.communication_strategy.connect() as client:
                     command = self.command_queue.get()
                     logger.debug(f"发送命令: {command.strip()}")
                     client.sendall(command.encode('utf-8'))
@@ -283,7 +283,7 @@ class BlxRobotArm(object):
 if __name__ == "__main__":
     try:
         # 连接机械臂
-        host = "192.168.10.111"
+        host = "192.168.10.234"
         port = 1234
         socket_communication = SocketCommunication(host, port)
         robot = BlxRobotArm(socket_communication)
@@ -299,10 +299,10 @@ if __name__ == "__main__":
         
         # 设置机械臂的命令模式
         logger.warning("\n3: 测试机械臂命令执行模式设置")
-        robot.set_robot_cmd_mode("INT")
-        time.sleep(1)
-        # robot.set_robot_cmd_mode("SEQ")
+        # robot.set_robot_cmd_mode("INT")
         # time.sleep(1)
+        robot.set_robot_cmd_mode("SEQ")
+        time.sleep(1)
         
         # 机械臂初始化，将机械臂关节角度归零
         logger.warning("\n4: 测试机械臂初始化")

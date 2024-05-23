@@ -200,12 +200,19 @@ class BlxRobotArm(object):
             return json.dumps({"command": "set_coordinate_axle_all_speed", "status": "false"})
 
     def get_joint_degree_all(self) -> dict:
-        """获取机械臂所有关节角度"""
-        get_joint_degree_thread = self.task_executor.submit(self.get_command_response, "get_joint_angle_all")
-        command = json.dumps({"command": "get_joint_angle_all"}).replace(' ', "").strip() + '\r\n'
-        self.command_queue.put(command)
-        data = json.loads(get_joint_degree_thread.result())
-        return data
+        """获取机械臂所有关节角度, 及时命令"""
+        before_joint_data_temp = {}
+        with self.communication_strategy.connect() as client:
+            command = json.dumps({"command": "get_joint_angle_all"}).replace(' ', "").strip() + '\r\n'
+            client.sendall(command.encode('utf-8'))
+            try:
+                recv_data = json.loads(client.recv(1024).decode('utf-8'))
+                before_joint_data_temp = recv_data  # 保留最后一次的关节角度数据
+            except json.JSONDecodeError:
+                logger.exception("获取机械臂关节角度失败!")
+                # 失败后发送最上一次的角度数据
+                return before_joint_data_temp
+        return recv_data
     
     def get_robot_cmd_model(self) -> str:
         """获取机械臂命令执行模式"""

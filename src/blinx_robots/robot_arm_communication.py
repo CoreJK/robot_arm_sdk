@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 import socket
-from loguru import logger
 from retrying import retry
 
 

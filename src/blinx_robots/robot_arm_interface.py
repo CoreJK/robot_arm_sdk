@@ -11,7 +11,8 @@ from spatialmath.base import rpy2tr
 from blinx_robots.robot_arm_module import BlinxRobotArm
 from blinx_robots.robot_arm_communication import SocketCommunication
 
-# logger.add("logs/robot_arm_interface.log", rotation="10 MB", level="DEBUG")
+logger.remove(handler_id=None)  #  关闭日志输出到终端
+logger.add("robot_arm_interface.log", rotation="10 MB", level="DEBUG", compression='zip', enqueue=True)
 
 class BlxRobotArm(object):
     """比邻星六轴机械臂 API"""
@@ -89,6 +90,7 @@ class BlxRobotArm(object):
     
     def set_robot_arm_init(self) -> str:
         """机械臂初始化，将机械臂关节角度归零
+        
         :return success: {"command": "set_joint_initialize", "status": "true"}
         :return failed: {"command": "set_joint_initialize", "status": "false"}
         """
@@ -107,6 +109,7 @@ class BlxRobotArm(object):
         
     def set_joint_degree_by_number(self, joint_number: int, speed_percentage: int, joint_degree: float) -> str:
         """设置指定的机械臂关节角度
+        
         :param joint_number: 机械臂关节编号 1~6
         :param speed_percentage: 机械臂关节运动速度百分比 1~100
         :param joint_degree: 机械臂关节角度, 单位:度
@@ -144,6 +147,7 @@ class BlxRobotArm(object):
     
     def set_joint_degree_synchronize(self, *args, speed_percentage: int = 50) -> str:
         """设置机械臂所有关节角度
+        
         :param *args: 机械臂所有关节的角度 q1, q2, q3, q4, q5, q6, 单位:度
         :param speed_percentage: 机械臂关节运动速度百分比 1~100
         
@@ -181,6 +185,7 @@ class BlxRobotArm(object):
     
     def set_robot_end_tool(self, io: int, status: bool) -> str:
         """设置机械臂 IO 口状态
+        
         :param io: 机械臂 IO 口, 1~3
         :param status: 机械臂 IO 口状态, True:打开, False:关闭
         
@@ -233,7 +238,7 @@ class BlxRobotArm(object):
         logger.debug(f"机械臂命令模式设置结果: {set_cmd_mode_status}")
         if set_cmd_mode_status:
             logger.warning(f"机械臂命令执行模式设置成功!")
-            cmd_mode_status = json.loads(self.get_robot_cmd_model()).get('data')
+            cmd_mode_status = json.loads(self.get_robot_cmd_mode()).get('data')
             self.robot_cmd_model = cmd_mode_status  # 更新机械臂对象的命令执行模式
             logger.warning(f"机械臂当前的命令执行模式: {self.robot_cmd_model}")
             return json.dumps({"command": "set_robot_mode", "status": True})
@@ -243,6 +248,7 @@ class BlxRobotArm(object):
 
     def set_joint_degree_by_coordinate(self, *args, speed_percentage: int = 50) -> str:
         """通过末端工具坐标与姿态，控制机械臂关节运动
+        
         :param *args: 机械臂末端工具坐标与姿态: x, y, z, Rx, Py, Yz
         :param speed_percentage: 机械臂关节运动速度百分比 1~100
         
@@ -278,18 +284,19 @@ class BlxRobotArm(object):
                 return before_joint_data_temp
         return recv_data
     
-    def get_robot_cmd_model(self) -> str:
+    def get_robot_cmd_mode(self) -> str:
         """获取机械臂命令执行模式
         
         :return: {"command": "get_robot_mode", "data": "SEQ"}
         """
-        robot_cmd_model = self.task_executor.submit(self.get_command_response, "get_robot_mode")
-        get_cmd_model_payload = json.dumps({"command": "get_robot_mode"}).replace(' ', "") + '\r\n'
-        self.command_queue.put(get_cmd_model_payload)
-        return robot_cmd_model.result()
+        robot_cmd_mode = self.task_executor.submit(self.get_command_response, "get_robot_mode")
+        get_cmd_mode_payload = json.dumps({"command": "get_robot_mode"}).replace(' ', "") + '\r\n'
+        self.command_queue.put(get_cmd_mode_payload)
+        return robot_cmd_mode.result()
              
     def get_positive_solution(self, *args, current_pose: bool = False) -> str:
         """获取机械臂正解
+        
         根据提供的机械臂各个关节的角度，计算出机械臂末端的位置和姿态
 
         :params args: 机械臂关节角度值 q1, q2, q3, q4, q5, q6, 单位:度
@@ -319,6 +326,7 @@ class BlxRobotArm(object):
 
     def get_inverse_solution(self, *args, current_pose: bool = False) -> str:
         """获取机械臂逆解
+        
         :params *args: 机械臂 x, y, z, Rx, Py, Yz 坐标
         :params current_pose: 是否使用当前机械臂关节角度值
         
@@ -361,25 +369,25 @@ class BlxRobotArm(object):
 if __name__ == "__main__":
     try:
         # 连接机械臂
-        host = "192.168.10.44"
+        host = "192.168.10.103"
         port = 1234
         socket_communication = SocketCommunication(host, port)
         robot = BlxRobotArm(socket_communication)
         
         # 机械臂通讯连接
-        logger.warning("\n1: 测试机械臂通讯连接")
+        print("\n1: 测试机械臂通讯连接")
         robot.start_communication()
         
         # 获取机械臂的命令执行模式
-        logger.warning("\n2: 测试机械臂命令执行模式")
-        robot_cmd_model = json.loads(robot.get_robot_cmd_model()).get('data') 
-        logger.info(f"机械臂的命令执行模式: {robot_cmd_model}")
+        print("\n2: 测试机械臂命令执行模式")
+        robot_cmd_model = json.loads(robot.get_robot_cmd_mode()).get('data') 
+        print(f"机械臂的命令执行模式: {robot_cmd_model}")
         
         # 设置机械臂的命令模式
         logger.warning("\n3: 测试机械臂命令执行模式设置")
         # robot.set_robot_cmd_mode("INT")
         # time.sleep(1)
-        logger.info(robot.set_robot_cmd_mode("SEQ"))
+        print(robot.set_robot_cmd_mode("SEQ"))
         time.sleep(1)
         
         # 机械臂初始化，将机械臂关节角度归零

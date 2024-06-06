@@ -8,8 +8,8 @@ from loguru import logger
 from spatialmath import SE3
 from spatialmath.base import rpy2tr
 
-from robot_arm_module import BlinxRobotArm
-from robot_arm_communication import SocketCommunication
+from blinx_robots.robot_arm_module import BlinxRobotArm
+from blinx_robots.robot_arm_communication import SocketCommunication
 
 logger.remove(handler_id=None)  #  关闭日志输出到终端
 logger.add("robot_arm_interface.log", rotation="10 MB", level="DEBUG", compression='zip', enqueue=True)
@@ -402,7 +402,7 @@ if __name__ == "__main__":
         print(f"机械臂的命令执行模式: {robot_cmd_model}")
         
         # 设置机械臂的命令模式
-        logger.warning("\n3: 测试机械臂命令执行模式设置")
+        print("\n3: 测试机械臂命令执行模式设置")
         robot.set_robot_cmd_mode("INT")
         time.sleep(1)
         print(robot.set_robot_cmd_mode("SEQ"))
@@ -501,7 +501,7 @@ if __name__ == "__main__":
             time.sleep(3)
         
         # 机械臂通讯关闭
-        logger.warning("\n21: 测试机械臂通讯关闭")
+        print("\n21: 测试机械臂通讯关闭")
         robot.end_communication()
         
     # 用户输入 crt + c 退出

@@ -1,6 +1,6 @@
 [project]
 name = "blinx_robots"
-version = "4.3.3"
+version = "4.4.3"
 authors = [
   { name="任伟明", email="coreJK@163.com" },
 ]

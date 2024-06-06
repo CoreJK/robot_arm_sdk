@@ -8,8 +8,8 @@ from loguru import logger
 from spatialmath import SE3
 from spatialmath.base import rpy2tr
 
-from blinx_robots.robot_arm_module import BlinxRobotArm
-from blinx_robots.robot_arm_communication import SocketCommunication
+from robot_arm_module import BlinxRobotArm
+from robot_arm_communication import SocketCommunication
 
 logger.remove(handler_id=None)  #  关闭日志输出到终端
 logger.add("robot_arm_interface.log", rotation="10 MB", level="DEBUG", compression='zip', enqueue=True)
@@ -201,6 +201,24 @@ class BlxRobotArm(object):
         else:
             return json.dumps({"command": "set_end_tool", "status": False})
     
+    def set_robot_io_status(self, io: int, status: bool) -> str:
+        """设置机械臂扩展 IO 口状态
+        
+        :param io: 机械臂 IO 口编号, 1~4
+        :param status: 机械臂 IO 口状态, True:打开, False:关闭
+        
+        :return success: {"command": "set_io_status", "status": true}
+        :return failed: {"command": "set_io_status", "status": false}
+        """
+        io_status = self.task_executor.submit(self.get_command_response, "set_robot_io_interface")
+        command = json.dumps({"command": "set_robot_io_interface", "data": [io, status]}).replace(' ', "").strip() + '\r\n'
+        self.command_queue.put(command)
+        io_status_result = json.loads(io_status.result()).get('data')
+        if io_status_result:
+            return json.dumps({"command": "set_io_status", "status": True})
+        else:
+            return json.dumps({"command": "set_io_status", "status": False})
+    
     def set_time_delay(self, delay_time: int) -> str:
         """设置机械臂命令之间执行延时时间
         
@@ -369,7 +387,7 @@ class BlxRobotArm(object):
 if __name__ == "__main__":
     try:
         # 连接机械臂
-        host = "192.168.10.103"
+        host = "192.168.10.48"
         port = 1234
         socket_communication = SocketCommunication(host, port)
         robot = BlxRobotArm(socket_communication)
@@ -385,92 +403,102 @@ if __name__ == "__main__":
         
         # 设置机械臂的命令模式
         logger.warning("\n3: 测试机械臂命令执行模式设置")
-        # robot.set_robot_cmd_mode("INT")
-        # time.sleep(1)
+        robot.set_robot_cmd_mode("INT")
+        time.sleep(1)
         print(robot.set_robot_cmd_mode("SEQ"))
         time.sleep(1)
         
         # 机械臂初始化，将机械臂关节角度归零
-        logger.warning("\n4: 测试机械臂初始化")
-        logger.info(robot.set_robot_arm_init())
+        print("\n4: 测试机械臂初始化")
+        print(robot.set_robot_arm_init())
         time.sleep(12)
         
         # 获取机械臂关节角度
-        logger.warning("\n5: 测试机械臂关节角度")
-        logger.info(robot.get_joint_degree_all())
+        print("\n5: 测试机械臂关节角度")
+        print(robot.get_joint_degree_all())
         time.sleep(1)
         
         # 设置机械臂单个关节角度
-        logger.warning("\n6: 测试机械臂单个关节角度设置")
-        logger.info(robot.set_joint_degree_by_number(1, 50, 90))
+        print("\n6: 测试机械臂单个关节角度设置")
+        print(robot.set_joint_degree_by_number(1, 50, 90))
         
         # 获取机械臂所有当前关节角度
-        logger.warning("\n7: 测试机械臂所有关节角度设置")
+        print("\n7: 测试机械臂所有关节角度设置")
         joint_degree = robot.get_joint_degree_all().get('data')
-        logger.info(f"机械臂所有关节角度: {joint_degree}")
+        print(f"机械臂所有关节角度: {joint_degree}")
         time.sleep(1)
         
         # 机械臂紧急停止
-        logger.warning("\n8: 测试机械臂紧急停止")
-        logger.info(robot.set_robot_arm_emergency_stop())
+        print("\n8: 测试机械臂紧急停止")
+        print(robot.set_robot_arm_emergency_stop())
         time.sleep(2)
         
         # 恢复机械臂状态
-        logger.warning("\n9: 测试机械臂急停后的状态恢复上电")
-        logger.info(robot.set_robot_arm_init())
+        print("\n9: 测试机械臂急停后的状态恢复上电")
+        print(robot.set_robot_arm_init())
         time.sleep(2)
         
-        logger.warning("\n10: 测试机械臂急停后的状态恢复")
-        logger.info(robot.set_robot_arm_init())
+        print("\n10: 测试机械臂急停后的状态恢复")
+        print(robot.set_robot_arm_init())
         time.sleep(12)
         
         # 设置机械臂末端工具控制
-        logger.warning("\n11: 测试机械臂末端工具控制使能")
-        logger.info(robot.set_robot_end_tool(1, True))  # 控制气泵打开
+        print("\n11: 测试机械臂末端工具控制使能")
+        print(robot.set_robot_end_tool(1, True))  # 控制气泵打开
         time.sleep(2)
-        logger.warning("\n12: 测试机械臂末端工具控制掉使能")
-        logger.info(robot.set_robot_end_tool(1, False))  # 控制气泵关闭
+        print("\n12: 测试机械臂末端工具控制掉使能")
+        print(robot.set_robot_end_tool(1, False))  # 控制气泵关闭
+        time.sleep(2)
+        
+        # 设置机械臂末端 IO 控制
+        print("\n13: 测试机械臂末端 IO 控制")
+        print("\n1 号控制口打开")
+        print(robot.set_robot_io_status(1, True))
+        time.sleep(2)
+        print("\n1 号控制口关闭")
+        print(robot.set_robot_io_status(1, False))
         time.sleep(2)
         
         # 设置机械臂所有关节角度协同运动
-        logger.warning("\n13: 测试机械臂所有关节角度协同运动")
-        logger.info(robot.set_joint_degree_synchronize(10, 10, 10, 10, 10, 10, speed_percentage=50))
+        print("\n13: 测试机械臂所有关节角度协同运动")
+        print(robot.set_joint_degree_synchronize(10, 10, 10, 10, 10, 10, speed_percentage=50))
         time.sleep(2)
         
         # 通过末端工具坐标与姿态，控制机械臂关节运动
-        logger.warning("\n14: 测试通过末端工具坐标与姿态，控制机械臂关节运动")
-        logger.info(robot.set_joint_degree_by_coordinate(0.287, 0.0, 0.269, 0.0, -0.0, 0.0, speed_percentage=50))
+        print("\n14: 测试通过末端工具坐标与姿态，控制机械臂关节运动")
+        print(robot.set_joint_degree_by_coordinate(0.287, 0.0, 0.269, 0.0, -0.0, 0.0, speed_percentage=50))
         time.sleep(5)
         
         # 机械臂回零
-        logger.warning("\n15: 测试机械臂回零")
-        logger.info(robot.set_robot_arm_home())
+        print("\n15: 测试机械臂回零")
+        print(robot.set_robot_arm_home())
         time.sleep(2)
         
         # 获取机械臂正解
-        logger.warning("\n16: 测试获取机械臂当前角度的, 正解")
-        logger.info(robot.get_positive_solution(current_pose=True))
-        logger.warning("\n17: 测试获取机械臂单独计算正解")
-        logger.info(robot.get_positive_solution(20, 0, 0, 0, 0, 0, current_pose=False))
+        print("\n16: 测试获取机械臂当前角度的, 正解")
+        print(robot.get_positive_solution(current_pose=True))
+        print("\n17: 测试获取机械臂单独计算正解")
+        print(robot.get_positive_solution(20, 0, 0, 0, 0, 0, current_pose=False))
         
         # 获取机械臂逆解
-        logger.warning("\n18: 测试获取机械臂当前角度的, 逆解")
-        logger.info(robot.get_inverse_solution(current_pose=True))
-        logger.warning("\n19: 测试获取机械臂单独计算逆解")
-        logger.info(robot.get_inverse_solution(0.23, 0.084, 0.269, 20.0, -0.0, -0.0, current_pose=False))
+        print("\n18: 测试获取机械臂当前角度的, 逆解")
+        print(robot.get_inverse_solution(current_pose=True))
+        print("\n19: 测试获取机械臂单独计算逆解")
+        print(robot.get_inverse_solution(0.23, 0.084, 0.269, 20.0, -0.0, -0.0, current_pose=False))
         
         # 顺序执行模式中, 使用延时命令
-        logger.warning("\n20: 测试机械臂顺序执行模式中, 使用延时命令")
-        logger.info(robot.set_joint_degree_synchronize(10, 10, 10, 10, 10, 10, speed_percentage=50))
-        logger.info(robot.set_time_delay(3000))
-        logger.info(robot.set_robot_end_tool(1, True))
-        logger.info(robot.set_time_delay(3000))
-        logger.info(robot.set_robot_end_tool(1, False))
-        logger.info(robot.set_time_delay(3000))
-        logger.info(robot.set_joint_degree_synchronize(20, 20, 20, 20, 20, 20, speed_percentage=50))
-        logger.info(robot.set_time_delay(3000))
-        logger.info(robot.set_robot_arm_home())
-        time.sleep(3)
+        if robot_cmd_model == "SEQ":
+            print("\n20: 测试机械臂顺序执行模式中, 使用延时命令")
+            print(robot.set_joint_degree_synchronize(10, 10, 10, 10, 10, 10, speed_percentage=50))
+            print(robot.set_time_delay(3000))
+            print(robot.set_robot_end_tool(1, True))
+            print(robot.set_time_delay(3000))
+            print(robot.set_robot_end_tool(1, False))
+            print(robot.set_time_delay(3000))
+            print(robot.set_joint_degree_synchronize(20, 20, 20, 20, 20, 20, speed_percentage=50))
+            print(robot.set_time_delay(3000))
+            print(robot.set_robot_arm_home())
+            time.sleep(3)
         
         # 机械臂通讯关闭
         logger.warning("\n21: 测试机械臂通讯关闭")

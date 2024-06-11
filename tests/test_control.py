@@ -12,7 +12,7 @@ if __name__ == "__main__":
     try:
         while True:
             # 连接机械臂
-            host = "192.168.10.55"
+            host = "192.168.10.101"
             port = 1234
             socket_communication = SocketCommunication(host, port)
             robot = BlxRobotArm(socket_communication)
@@ -28,8 +28,8 @@ if __name__ == "__main__":
             
             # 设置机械臂的命令模式
             print("\n3: 测试机械臂命令执行模式设置")
-            # robot.set_robot_cmd_mode("INT")
-            # time.sleep(1)
+            robot.set_robot_cmd_mode("INT")
+            time.sleep(1)
             print(robot.set_robot_cmd_mode("SEQ"))
             time.sleep(1)
             
@@ -75,6 +75,15 @@ if __name__ == "__main__":
             print(robot.set_robot_end_tool(1, False))  # 控制气泵关闭
             time.sleep(2)
             
+            # 设置机械臂末端 IO 控制
+            print("\n13: 测试机械臂末端 IO 控制")
+            print("\n1 号控制口打开")
+            print(robot.set_robot_io_status(1, True))
+            time.sleep(2)
+            print("\n1 号控制口关闭")
+            print(robot.set_robot_io_status(1, False))
+            time.sleep(2)
+            
             # 设置机械臂所有关节角度协同运动
             print("\n13: 测试机械臂所有关节角度协同运动")
             print(robot.set_joint_degree_synchronize(10, 10, 10, 10, 10, 10, speed_percentage=50))
@@ -82,8 +91,8 @@ if __name__ == "__main__":
             
             # 通过末端工具坐标与姿态，控制机械臂关节运动
             print("\n14: 测试通过末端工具坐标与姿态，控制机械臂关节运动")
-            print(robot.set_joint_degree_by_coordinate(0.287, 0.0, 0.269, 0.0, -0.0, 0.0, speed_percentage=50))
-            time.sleep(5)
+            print(robot.set_robot_arm_coordinate(278.731, 0.000, 268.219, 180.000, -0.006, 0.000, speed_percentage=100))
+            time.sleep(3)
             
             # 机械臂回零
             print("\n15: 测试机械臂回零")
@@ -91,35 +100,28 @@ if __name__ == "__main__":
             time.sleep(2)
             
             # 获取机械臂正解
-            print("\n16: 测试获取机械臂当前角度的, 正解")
-            print(robot.get_positive_solution(current_pose=True))
-            print("\n17: 测试获取机械臂单独计算正解")
-            print(robot.get_positive_solution(20, 0, 0, 0, 0, 0, current_pose=False))
-            
-            # 获取机械臂逆解
-            print("\n18: 测试获取机械臂当前角度的, 逆解")
-            print(robot.get_inverse_solution(current_pose=True))
-            print("\n19: 测试获取机械臂单独计算逆解")
-            print(robot.get_inverse_solution(0.23, 0.084, 0.269, 20.0, -0.0, -0.0, current_pose=False))
+            print("\n16: 测试获取机械臂当前角度的正解值")
+            print(robot.get_robot_coordinate())
+            time.sleep(2)
             
             # 顺序执行模式中, 使用延时命令
-            print("\n20: 测试机械臂顺序执行模式中, 使用延时命令")
-            print(robot.set_joint_degree_synchronize(10, 10, 10, 10, 10, 10, speed_percentage=50))
-            print(robot.set_time_delay(3000))
-            print(robot.set_robot_end_tool(1, True))
-            print(robot.set_time_delay(3000))
-            print(robot.set_robot_end_tool(1, False))
-            print(robot.set_time_delay(3000))
-            print(robot.set_joint_degree_synchronize(20, 20, 20, 20, 20, 20, speed_percentage=50))
-            print(robot.set_time_delay(3000))
-            print(robot.set_robot_arm_home())
-            time.sleep(3)
+            if robot_cmd_model == "SEQ":
+                print("\n19: 测试机械臂顺序执行模式中, 使用延时命令")
+                print(robot.set_joint_degree_synchronize(10, 10, 10, 10, 10, 10, speed_percentage=50))
+                print(robot.set_time_delay(3000))
+                print(robot.set_robot_end_tool(1, True))
+                print(robot.set_time_delay(3000))
+                print(robot.set_robot_end_tool(1, False))
+                print(robot.set_time_delay(3000))
+                print(robot.set_joint_degree_synchronize(20, 20, 20, 20, 20, 20, speed_percentage=50))
+                print(robot.set_time_delay(3000))
+                print(robot.set_robot_arm_home())
+                time.sleep(3)
             
             # 机械臂通讯关闭
-            print("\n21: 测试机械臂通讯关闭")
+            print("\n20: 测试机械臂通讯关闭")
             robot.end_communication()
-            
+        
     # 用户输入 crt + c 退出
     except KeyboardInterrupt:        
         robot.end_communication()
-        

@@ -179,10 +179,10 @@ class BlxRobotArm(object):
         return json.dumps({"command": "set_joint_emergency_stop", "status": True})
     
     def set_robot_end_tool(self, io: int, status: bool) -> str:
-        """设置机械臂 IO 口状态
+        """设置机械臂末端工具状态
         
-        :param io: 机械臂 IO 口, 1~3
-        :param status: 机械臂 IO 口状态, True:打开, False:关闭
+        :param io: 机械臂末端工具编号, 1~3
+        :param status: 机械臂末端工具使能状态, True:打开, False:关闭
         
         :return success: {"command": "set_end_tool", "status": true}
         :return failed: {"command": "set_end_tool", "status": false}

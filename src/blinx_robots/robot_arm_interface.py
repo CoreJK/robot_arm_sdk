@@ -217,6 +217,8 @@ class BlxRobotArm(object):
     def set_time_delay(self, delay_time: int) -> str:
         """设置机械臂命令之间执行延时时间
         
+        在顺序执行模式中, 可以通过该延时命令, 控制机械臂命令之间的执行时间间隔
+        
         :return success: {"command": "set_time_delay", "status": true}
         :return failed: {"command": "set_time_delay", "status": false}
         """

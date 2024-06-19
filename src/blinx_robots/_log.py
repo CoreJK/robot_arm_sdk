@@ -34,6 +34,7 @@ class LoggerFileFormatter(logging.Formatter):
         colored_record = copy.copy(record)
         levelname = colored_record.levelname
         colored_levelname = f"{levelname.ljust(9)}"  # 1 表示样式为粗体，ljust(9) 使得所有的 levelname 都有相同的长度
+        colored_record.name = f"{colored_record.name}:{colored_record.funcName}:{colored_record.lineno}"
         colored_record.levelname = colored_levelname
         
         return super().format(colored_record)
@@ -51,10 +52,3 @@ file_handler = logging.handlers.RotatingFileHandler('blinx_robot_arm.log', maxBy
 file_handler.setFormatter(LoggerFileFormatter(FORMAT))  # 日志格式化器
 logger.addHandler(file_handler)
 logger.setLevel(logging.DEBUG)
-
-if __name__ == '__main__':
-    logger.debug('debug message')
-    logger.info('info message')
-    logger.warning('warning message')
-    logger.error('error message')
-    logger.critical('critical message')

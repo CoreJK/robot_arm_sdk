@@ -3,12 +3,9 @@ import json
 from queue import Queue
 from concurrent.futures import ThreadPoolExecutor
 
-from loguru import logger
-
 from blinx_robots.robot_arm_communication import SocketCommunication
+from blinx_robots._log import logger
 
-logger.remove(handler_id=None)  #  关闭日志输出到终端
-logger.add("robot_arm_interface.log", rotation="10 MB", level="DEBUG", compression='zip', enqueue=True)
 
 class BlxRobotArm(object):
     """比邻星六轴机械臂 API"""
@@ -344,7 +341,6 @@ class BlxRobotArm(object):
         get_command_response = False
         while not get_command_response:
             time.sleep(0.1)
-            print(f"等待 {command_name} 命令响应结果...")
             if not self.recv_data_buffer.empty():
                 data = self.recv_data_buffer.get()
                 if command_name in data:
@@ -358,7 +354,7 @@ class BlxRobotArm(object):
 if __name__ == "__main__":
     try:
         # 连接机械臂
-        host = "192.168.10.101"
+        host = "192.168.10.20"
         port = 1234
         socket_communication = SocketCommunication(host, port)
         robot = BlxRobotArm(socket_communication)

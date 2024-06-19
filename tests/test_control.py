@@ -2,17 +2,18 @@
 # 测试 SDK 控制机械臂功能的代码
 import time
 import json
+import logging
 
 from blinx_robots.robot_arm_interface import BlxRobotArm
 from blinx_robots.robot_arm_communication import SocketCommunication
 
-# logger.add("robot_arm_interface.log", rotation="10 MB", level="DEBUG")
+logging.disable(logging.CRITICAL)
 
 if __name__ == "__main__":
     try:
         while True:
             # 连接机械臂
-            host = "192.168.10.101"
+            host = "192.168.10.20"
             port = 1234
             socket_communication = SocketCommunication(host, port)
             robot = BlxRobotArm(socket_communication)

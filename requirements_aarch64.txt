@@ -1,0 +1,9 @@
+build==1.2.1
+importlib_metadata==7.2.1
+Nuitka==2.3.9
+ordered-set==4.1.0
+packaging==24.1
+pyproject_hooks==1.1.0
+tomli==2.0.1
+zipp==3.19.2
+zstandard==0.22.0

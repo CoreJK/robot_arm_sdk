@@ -9,9 +9,13 @@ readme = "README.md"
 requires-python = ">=3.8"
 classifiers = [
     "Private :: Do Not Upload",
+    "Development Status :: 3 - Alpha",
     "Programming Language :: Python :: 3.8",
     "License :: OSI Approved :: MIT License",
     "Operating System :: Microsoft :: Windows :: Windows 11",
+    "Operating System :: Microsoft :: Windows :: Windows 10",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: POSIX :: Other"
 ]
 
 [project.urls]
@@ -19,5 +23,5 @@ Homepage = "https://gitee.com/blxsoftware/robot_arm_sdk"
 Issues = "https://gitee.com/blxsoftware/robot_arm_sdk/issues"
 
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools>=59"]
 build-backend = "setuptools.build_meta"

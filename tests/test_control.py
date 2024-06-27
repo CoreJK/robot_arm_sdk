@@ -12,8 +12,8 @@ if __name__ == "__main__":
     try:
         while True:
             # 连接机械臂
-            host = "192.168.10.55"
-            port = 1234
+            host = "192.168.10.33"
+            port = 4197
             socket_communication = SocketCommunication(host, port)
             robot = BlxRobotArm(socket_communication)
             
@@ -75,6 +75,15 @@ if __name__ == "__main__":
             print(robot.set_robot_end_tool(1, False))  # 控制气泵关闭
             time.sleep(2)
             
+            # 设置机械臂末端 IO 控制
+            print("\n13: 测试机械臂末端 IO 控制")
+            print("\n1 号控制口打开")
+            print(robot.set_robot_io_status(1, True))
+            time.sleep(2)
+            print("\n1 号控制口关闭")
+            print(robot.set_robot_io_status(1, False))
+            time.sleep(2)
+            
             # 设置机械臂所有关节角度协同运动
             print("\n13: 测试机械臂所有关节角度协同运动")
             print(robot.set_joint_degree_synchronize(10, 10, 10, 10, 10, 10, speed_percentage=50))
@@ -103,17 +112,18 @@ if __name__ == "__main__":
             print(robot.get_inverse_solution(0.23, 0.084, 0.269, 20.0, -0.0, -0.0, current_pose=False))
             
             # 顺序执行模式中, 使用延时命令
-            print("\n20: 测试机械臂顺序执行模式中, 使用延时命令")
-            print(robot.set_joint_degree_synchronize(10, 10, 10, 10, 10, 10, speed_percentage=50))
-            print(robot.set_time_delay(3000))
-            print(robot.set_robot_end_tool(1, True))
-            print(robot.set_time_delay(3000))
-            print(robot.set_robot_end_tool(1, False))
-            print(robot.set_time_delay(3000))
-            print(robot.set_joint_degree_synchronize(20, 20, 20, 20, 20, 20, speed_percentage=50))
-            print(robot.set_time_delay(3000))
-            print(robot.set_robot_arm_home())
-            time.sleep(3)
+            if robot_cmd_model == "SEQ":
+                print("\n20: 测试机械臂顺序执行模式中, 使用延时命令")
+                print(robot.set_joint_degree_synchronize(10, 10, 10, 10, 10, 10, speed_percentage=50))
+                print(robot.set_time_delay(3000))
+                print(robot.set_robot_end_tool(1, True))
+                print(robot.set_time_delay(3000))
+                print(robot.set_robot_end_tool(1, False))
+                print(robot.set_time_delay(3000))
+                print(robot.set_joint_degree_synchronize(20, 20, 20, 20, 20, 20, speed_percentage=50))
+                print(robot.set_time_delay(3000))
+                print(robot.set_robot_arm_home())
+                time.sleep(3)
             
             # 机械臂通讯关闭
             print("\n21: 测试机械臂通讯关闭")

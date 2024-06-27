@@ -679,4 +679,5 @@ $RECYCLE.BIN/
 # Custom rules (everything added below won't be overriden by 'Generate .gitignore File' if you use 'Update' option)
 
 test_dist_package/
+.pdm-python
 cs-sdk-venv/

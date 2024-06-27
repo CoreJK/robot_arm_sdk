@@ -680,3 +680,4 @@ $RECYCLE.BIN/
 
 test_dist_package/
 cs-sdk-venv/
+.pdm-python

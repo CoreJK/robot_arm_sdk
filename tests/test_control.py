@@ -13,8 +13,8 @@ if __name__ == "__main__":
     try:
         while True:
             # 连接机械臂
-            host = "192.168.10.20"
-            port = 1234
+            host = "192.168.10.39"
+            port = 4197
             socket_communication = SocketCommunication(host, port)
             robot = BlxRobotArm(socket_communication)
             

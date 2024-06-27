@@ -682,3 +682,4 @@ $RECYCLE.BIN/
 test_dist_package/
 venv-*/
 .python-version
+.pdm-python

@@ -163,6 +163,17 @@ class BlxRobotArm(object):
             logger.error("关节超出范围!")
             return json.dumps({"command": "set_joint_angle_all_time", "status": False})
     
+    def set_robot_arm_joint_stop(self) -> str:
+        """机械臂关节停止运动, 与紧急停止不同，不需要重新初始化
+
+        :return success: {"command": "set_joint_stop", "status": "true"}
+        """
+        with self.communication_strategy.connect() as client:
+            command = json.dumps({"command": "set_joint_stop", "data": [0]}).replace(' ', "").strip() + '\r\n'
+            client.send(command.encode('utf-8'))
+            logger.warning("机械臂停止!")
+        return json.dumps({"command": "set_joint_stop", "status": True})
+    
     def set_robot_arm_emergency_stop(self) -> str:
         """机械臂紧急停止
         
@@ -283,6 +294,14 @@ class BlxRobotArm(object):
             logger.error("坐标控制机械臂关节运动失败!")
             return json.dumps({"command": "set_robot_arm_coordinate", "status": False})
 
+    def set_robot_arm_coordinate_teach(self, axis: int, direction: int, speed: float, distance: float) -> str:
+        """机械臂坐标示教, 可适配摇杆以及按钮长按控制"""
+        with self.communication_strategy.connect() as client:
+            command = json.dumps({"command": "set_coordinate_teach", "data": [axis, direction, speed, distance]}).replace(' ', "").strip() + '\r\n'
+            client.send(command.encode('utf-8'))
+            logger.warning("机械臂示教中...")
+        return json.dumps({"command": "set_coordinate_teach", "status": True})
+    
     def get_joint_degree_all(self) -> dict:
         """获取机械臂所有关节角度
         

@@ -13,8 +13,8 @@ if __name__ == "__main__":
     try:
         while True:
             # 连接机械臂
-            host = "192.168.10.39"
-            port = 4197
+            host = "192.168.10.78"
+            port = 1234
             socket_communication = SocketCommunication(host, port)
             robot = BlxRobotArm(socket_communication)
             
@@ -119,8 +119,38 @@ if __name__ == "__main__":
                 print(robot.set_robot_arm_home())
                 time.sleep(3)
             
+            print("\n20: 测试机械臂坐标(x,y,z,Rx,Ry,Rz)示教功能")
+            robot.set_robot_cmd_mode("INT")
+            coordinate_data = [[1, 1], [1, 0], [2, 1], [2, 0], 
+                            [3, 1], [3, 0], [4, 1], [4, 0], 
+                            [5, 1], [5, 0], [6, 1], [6, 0],
+                            ]
+            for each_data in coordinate_data:
+                robot.set_robot_arm_coordinate_teach(each_data[0], each_data[1], 0.2, 0)
+                time.sleep(3)
+                robot.set_robot_arm_joint_stop()
+                time.sleep(1)
+            
+            robot.set_robot_arm_home()
+            time.sleep(2)
+            
+            print("\n21: 测试机械臂，沿象限方向移动")
+            quadrants = [[7, 1], [7, 0], [8, 1], [8, 0],
+                        [8, 1], [8, 0], [9, 1], [9, 0],
+                        [10, 1], [10, 0]]
+            for each_quadrant in quadrants:
+                robot.set_robot_arm_coordinate_teach(each_quadrant[0], each_quadrant[1], 0.2, 0)
+                time.sleep(3)
+                robot.set_robot_arm_joint_stop()
+                time.sleep(1)
+                robot.set_robot_arm_home()
+                time.sleep(1)
+            
+            robot.set_robot_arm_home()
+            time.sleep(2)
+            
             # 机械臂通讯关闭
-            print("\n20: 测试机械臂通讯关闭")
+            print("\n22: 测试机械臂通讯关闭")
             robot.end_communication()
         
     # 用户输入 crt + c 退出

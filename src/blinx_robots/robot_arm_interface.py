@@ -397,7 +397,7 @@ if __name__ == "__main__":
         print(robot.set_robot_cmd_mode("SEQ"))
         time.sleep(1)
         
-        # # 机械臂初始化，将机械臂关节角度归零
+        # 机械臂初始化，将机械臂关节角度归零
         print("\n4: 测试机械臂初始化")
         print(robot.set_robot_arm_init())
         time.sleep(12)
@@ -514,7 +514,7 @@ if __name__ == "__main__":
         time.sleep(2)
         
         # 机械臂通讯关闭
-        print("\n21: 测试机械臂通讯关闭")
+        print("\n22: 测试机械臂通讯关闭")
         robot.end_communication()
         
     # 用户输入 crt + c 退出

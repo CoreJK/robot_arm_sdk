@@ -34,7 +34,6 @@ build-backend = "setuptools.build_meta"
 distribution = true
 
 [tool.pdm.dev-dependencies]
-test = []
 build = [
     "nuitka>=2.3.9",
 ]

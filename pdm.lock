@@ -2,10 +2,10 @@
 # It is not intended for manual editing.
 
 [metadata]
-groups = ["default", "test", "build"]
+groups = ["default", "build"]
 strategy = ["cross_platform", "inherit_metadata"]
 lock_version = "4.4.2"
-content_hash = "sha256:4898fc0bf6ec6b3aa70a172b553b184bb28d66d508d53ff654f33e3fd6ad14b0"
+content_hash = "sha256:9ea3d46a292657ae302eb6f4bcb450e1b10003bd59d13ee0b550356263f2f165"
 
 [[package]]
 name = "cffi"
@@ -74,7 +74,7 @@ files = [
 
 [[package]]
 name = "nuitka"
-version = "2.3.9"
+version = "2.3.11"
 summary = "Python compiler with full language support and CPython compatibility"
 groups = ["build"]
 dependencies = [
@@ -82,7 +82,7 @@ dependencies = [
     "zstandard>=0.15",
 ]
 files = [
-    {file = "Nuitka-2.3.9.tar.gz", hash = "sha256:7053e7d8954b55486ea22010e7914c89ff5e95f4c48a89fddcdea96832734362"},
+    {file = "Nuitka-2.3.11.tar.gz", hash = "sha256:76ef09da42dc41c8f96073bba1954d09bf595cbb06cc9aba77ea3000eb1f3ad1"},
 ]
 
 [[package]]

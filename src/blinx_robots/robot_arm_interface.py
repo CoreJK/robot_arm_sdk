@@ -163,6 +163,17 @@ class BlxRobotArm(object):
             logger.error("关节超出范围!")
             return json.dumps({"command": "set_joint_angle_all_time", "status": False})
     
+    def set_robot_arm_joint_stop(self) -> str:
+        """机械臂关节停止运动, 与紧急停止不同，不需要重新初始化
+
+        :return success: {"command": "set_joint_stop", "status": "true"}
+        """
+        with self.communication_strategy.connect() as client:
+            command = json.dumps({"command": "set_joint_stop", "data": [0]}).replace(' ', "").strip() + '\r\n'
+            client.send(command.encode('utf-8'))
+            logger.warning("机械臂停止!")
+        return json.dumps({"command": "set_robot_arm_joint_stop", "status": True})
+    
     def set_robot_arm_emergency_stop(self) -> str:
         """机械臂紧急停止
         
@@ -182,16 +193,11 @@ class BlxRobotArm(object):
         :param status: 机械臂末端工具使能状态, True:打开, False:关闭
         
         :return success: {"command": "set_end_tool", "status": true}
-        :return failed: {"command": "set_end_tool", "status": false}
         """
-        end_tool_status = self.task_executor.submit(self.get_command_response, "set_end_tool")
-        command = json.dumps({"command": "set_end_tool", "data": [io, status]}).replace(' ', "").strip() + '\r\n'
-        self.command_queue.put(command)
-        end_tool_status_result = json.loads(end_tool_status.result()).get('data')
-        if end_tool_status_result:
-            return json.dumps({"command": "set_end_tool", "status": True})
-        else:
-            return json.dumps({"command": "set_end_tool", "status": False})
+        with self.communication_strategy.connect() as client:
+            command = json.dumps({"command": "set_end_tool", "data": [io, status]}).replace(' ', "").strip() + '\r\n'
+            client.send(command.encode('utf-8'))
+        return json.dumps({"command": "set_end_tool", "status": True})
     
     def set_robot_io_status(self, io: int, status: bool) -> str:
         """设置机械臂扩展 IO 口状态
@@ -283,6 +289,22 @@ class BlxRobotArm(object):
             logger.error("坐标控制机械臂关节运动失败!")
             return json.dumps({"command": "set_robot_arm_coordinate", "status": False})
 
+    def set_robot_arm_coordinate_teach(self, axis: int, direction: int, speed: float, distance: float) -> str:
+        """机械臂坐标示教, 可适配摇杆以及按钮长按控制
+        
+        :param int axis: 要移动的坐标轴或象限: 1-6:(X,Y,Z,RX,RY,RZ), 7-10: (1到4象限方向)
+        :param int direction: 坐标的方向: 0 负方向 1正方向
+        :param float speed: 插补步长 mm (建议: 0.1~0.3)
+        :param float distance: 运动距离 mm 或度, 0 为持续运动
+        :return str: {"command": "set_coordinate_teach", "status": True}
+        """
+        with self.communication_strategy.connect() as client:
+            command = json.dumps({"command": "set_coordinate_teach", "data": [axis, direction, speed, distance]}).replace(' ', "").strip() + '\r\n'
+            client.send(command.encode('utf-8'))
+            logger.warning("机械臂示教中...")
+            logger.debug(f"{command}")
+        return json.dumps({"command": "set_robot_arm_coordinate_teach", "status": True})
+    
     def get_joint_degree_all(self) -> dict:
         """获取机械臂所有关节角度
         
@@ -354,7 +376,7 @@ class BlxRobotArm(object):
 if __name__ == "__main__":
     try:
         # 连接机械臂
-        host = "192.168.10.20"
+        host = "192.168.10.78"
         port = 1234
         socket_communication = SocketCommunication(host, port)
         robot = BlxRobotArm(socket_communication)
@@ -460,8 +482,39 @@ if __name__ == "__main__":
             print(robot.set_robot_arm_home())
             time.sleep(3)
         
+        print("\n20: 测试机械臂坐标(x,y,z,Rx,Ry,Rz)示教功能")
+        robot.set_robot_cmd_mode("INT")
+        
+        coordinate_data = [[1, 1], [1, 0], [2, 1], [2, 0], 
+                           [3, 1], [3, 0], [4, 1], [4, 0], 
+                           [5, 1], [5, 0], [6, 1], [6, 0],
+                          ]
+        for each_data in coordinate_data:
+            robot.set_robot_arm_coordinate_teach(each_data[0], each_data[1], 0.2, 0)
+            time.sleep(3)
+            robot.set_robot_arm_joint_stop()
+            time.sleep(1)
+        
+        robot.set_robot_arm_home()
+        time.sleep(2)
+        
+        print("\n21: 测试机械臂，沿象限方向移动")
+        quadrants = [[7, 1], [7, 0], [8, 1], [8, 0],
+                    [8, 1], [8, 0], [9, 1], [9, 0],
+                    [10, 1], [10, 0]]
+        for each_quadrant in quadrants:
+            robot.set_robot_arm_coordinate_teach(each_quadrant[0], each_quadrant[1], 0.2, 0)
+            time.sleep(3)
+            robot.set_robot_arm_joint_stop()
+            time.sleep(1)
+            robot.set_robot_arm_home()
+            time.sleep(1)
+        
+        robot.set_robot_arm_home()
+        time.sleep(2)
+        
         # 机械臂通讯关闭
-        print("\n20: 测试机械臂通讯关闭")
+        print("\n22: 测试机械臂通讯关闭")
         robot.end_communication()
         
     # 用户输入 crt + c 退出

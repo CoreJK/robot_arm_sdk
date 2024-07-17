@@ -1,15 +1,16 @@
 [project]
 name = "blinx_robots"
-version = "4.5.3"
+version = "4.5.5"
 authors = [
     {name = "任伟明", email = "corejk@163.com"},
 ]
 description = "比邻星桌面式六轴协作机械臂 SDK"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.6"
 classifiers = [
     "Private :: Do Not Upload",
     "Development Status :: 3 - Alpha",
+    "Programming Language :: Python :: 3.6",
     "Programming Language :: Python :: 3.8",
     "License :: OSI Approved :: Apache License",
     "Operating System :: Microsoft :: Windows :: Windows 11",
@@ -34,7 +35,6 @@ build-backend = "setuptools.build_meta"
 distribution = true
 
 [tool.pdm.dev-dependencies]
-test = []
 build = [
     "nuitka>=2.3.9",
 ]

@@ -31,7 +31,7 @@ class BlinxRobotArm(DHRobot):
         L4 = RevoluteMDH(
                         alpha = -pi / 2,
                         a = 0,
-                        d = 0.2205,
+                        d = 0.223,
                         offset = 0,
                         qlim = [radians(-150), radians(150)]
                         )
@@ -45,7 +45,7 @@ class BlinxRobotArm(DHRobot):
         L6 = RevoluteMDH(
                         alpha = pi / 2,
                         a = 0,
-                        d = -0.045,
+                        d = -0.10879,
                         offset = 0,
                         qlim = [radians(-180), radians(180)]
                         )
@@ -94,7 +94,7 @@ class BlinxRobotArmDH(DHRobot):
         L4 = RevoluteDH(
                         alpha = pi / 2,
                         a = 0.0,
-                        d = 0.2205,
+                        d = 0.223,
                         offset = 0,
                         qlim=[radians(-150), radians(150)]
                         )
@@ -108,7 +108,7 @@ class BlinxRobotArmDH(DHRobot):
         L6 = RevoluteDH(
                         alpha = 0,
                         a = 0.0,
-                        d = -0.045,
+                        d = -0.10879,
                         offset = 0,
                         qlim=[radians(-180), radians(180)]
                         )

@@ -316,7 +316,10 @@ class BlxRobotArm(object):
             client.sendall(command.encode('utf-8'))
             try:
                 recv_data = json.loads(client.recv(1024).decode('utf-8'))
-                before_joint_data_temp = recv_data  # 保留最后一次的关节角度数据
+                if recv_data.get('return') == 'get_coordinate':
+                    return before_joint_data_temp
+                else:
+                    before_joint_data_temp = recv_data  # 保留最后一次的关节角度数据
             except json.JSONDecodeError:
                 logger.exception("获取机械臂关节角度失败!")
                 # 失败后发送最上一次的角度数据

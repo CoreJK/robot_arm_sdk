@@ -102,7 +102,7 @@ class BlxRobotArm(object):
         self.command_queue.put(command)
         
         robot_arm_init_status_result = json.loads(robot_arm_init_status.result()).get('data')
-        if robot_arm_init_status_result:
+        if robot_arm_init_status_result == 'true':
             return json.dumps({"command": "set_joint_initialize", "status": True})
         else:
             return json.dumps({"command": "set_joint_initialize", "status": False})
@@ -123,7 +123,7 @@ class BlxRobotArm(object):
         self.command_queue.put(command)
         
         get_command_response_status_result = json.loads(get_command_response_status.result()).get('data')
-        if get_command_response_status_result:
+        if get_command_response_status_result == 'true':
             return json.dumps({"command": "set_joint_angle", "status": True})
         else:
             return json.dumps({"command": "set_joint_angle", "status": False})
@@ -140,7 +140,7 @@ class BlxRobotArm(object):
         logger.warning("机械臂回零!")
         
         robot_arm_to_home_status_result = json.loads(robot_arm_to_home_status.result()).get('data')
-        if robot_arm_to_home_status:
+        if robot_arm_to_home_status_result == 'true':
             return json.dumps({"command": "set_robot_arm_home", "status": True})
         else:
             return json.dumps({"command": "set_robot_arm_home", "status": False})
@@ -163,7 +163,7 @@ class BlxRobotArm(object):
             self.command_queue.put(command)
             
             set_joint_angle_all_time_status_result = json.loads(set_joint_angle_all_time_status.result()).get('data')
-            if set_joint_angle_all_time_status_result:
+            if set_joint_angle_all_time_status_result == 'true':
                 return json.dumps({"command": "set_joint_angle_all_time", "status": True})
             else:
                 return json.dumps({"command": "set_joint_angle_all_time", "status": False})
@@ -183,11 +183,14 @@ class BlxRobotArm(object):
             logger.warning("机械臂紧急停止!")
         return json.dumps({"command": "set_joint_emergency_stop", "status": True})
     
-    def set_robot_end_tool(self, io: int, status: bool) -> str:
-        """设置机械臂 IO 口状态
+    def set_robot_end_tool(self, io: int, status) -> str:
+        """设置机械臂末端工具状态
         
-        :param io: 机械臂 IO 口, 1~3
-        :param status: 机械臂 IO 口状态, True:打开, False:关闭
+        :param io: 机械臂末端工具编号, 1: 吸盘、2: 电动夹爪、3: 柔性夹爪
+        :param status: 
+             - 编号为 1: True: 打开, False: 关闭
+             - 编号为 2: 0 ~ 100 整数值
+             - 编号为 3: True: 吹气，False: 吸气
         
         :return success: {"command": "set_end_tool", "status": true}
         :return failed: {"command": "set_end_tool", "status": false}
@@ -214,7 +217,7 @@ class BlxRobotArm(object):
         command = json.dumps({"command": "set_robot_io_interface", "data": [io, status]}).replace(' ', "").strip() + '\r\n'
         self.command_queue.put(command)
         io_status_result = json.loads(io_status.result()).get('data')
-        if io_status_result:
+        if io_status_result == 'true':
             return json.dumps({"command": "set_io_status", "status": True})
         else:
             return json.dumps({"command": "set_io_status", "status": False})
@@ -254,7 +257,7 @@ class BlxRobotArm(object):
         
         set_cmd_mode_status = json.loads(set_cmd_mode_thread.result()).get('data')
         logger.debug(f"机械臂命令模式设置结果: {set_cmd_mode_status}")
-        if set_cmd_mode_status:
+        if set_cmd_mode_status == 'true':
             logger.warning(f"机械臂命令执行模式设置成功!")
             cmd_mode_status = json.loads(self.get_robot_cmd_mode()).get('data')
             self.robot_cmd_model = cmd_mode_status  # 更新机械臂对象的命令执行模式

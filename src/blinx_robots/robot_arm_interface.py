@@ -292,6 +292,36 @@ class BlxRobotArm(object):
             logger.error("坐标控制机械臂关节运动失败!")
             return json.dumps({"command": "set_robot_arm_coordinate", "status": False})
 
+    def set_move_line(self, *args, step=1) -> str:
+        """机械臂末端执行直线运动
+
+        :param *args: 目标的坐标和姿态值 x,y,z,Rx,Py,Yz (mm)
+        :param int step: 末端的运动步长, 默认为 0.1 ~ 0.5
+        :return str: _description_
+        """
+        x, y, z, Rx, Py, Yz = args
+        with self.communication_strategy.connect() as client:
+            command = json.dumps({"command": "set_move_l", "data": [step, x, y, z, Rx, Py, Yz]}).replace(' ', "").strip() + '\r\n'
+            client.send(command.encode('utf-8'))
+            logger.warning("机械臂直线运动中...")
+            logger.debug(f"{command}")
+        return json.dumps({"command": "set_move_l", "status": True})
+    
+    def set_move_circle(self, *args, step=1) -> str:
+        """机械臂末端执行圆弧运动
+
+        :return str: _description_
+        :param *args: 目标的坐标和姿态值  x_1, y_1, z_1, Rx_1, Py_1, Yz_1, x_2, y_2, z_2, Rx_2, Py_2, Yz_2 (mm)
+        :param int step: 末端的运动步长, 默认为 0.1 ~ 0.5
+        """
+        x_1, y_1, z_1, Rx_1, Py_1, Yz_1, x_2, y_2, z_2, Rx_2, Py_2, Yz_2 = args
+        with self.communication_strategy.connect() as client:
+            command = json.dumps({"command": "set_move_c", "data": [step, x_1, y_1, z_1, Rx_1, Py_1, Yz_1, x_2, y_2, z_2, Rx_2, Py_2, Yz_2]}).replace(' ', "").strip() + '\r\n'
+            client.send(command.encode('utf-8'))
+            logger.warning("机械臂圆弧运动中...")
+            logger.debug(f"{command}")
+        return json.dumps({"command": "set_move_c", "status": True})
+    
     def set_robot_arm_coordinate_teach(self, axis: int, direction: int, speed: float, distance: float) -> str:
         """机械臂坐标示教, 可适配摇杆以及按钮长按控制
         

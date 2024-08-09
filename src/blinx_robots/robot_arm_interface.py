@@ -1,3 +1,4 @@
+# -*- coding:utf-8 -*-
 import time
 import json
 from queue import Queue
@@ -102,9 +103,9 @@ class BlxRobotArm(object):
     def set_joint_degree_by_number(self, joint_number: int, speed_percentage: int, joint_degree: float) -> str:
         """设置指定的机械臂关节角度
         
-        :param joint_number: 机械臂关节编号 1~6
-        :param speed_percentage: 机械臂关节运动速度百分比 1~100
-        :param joint_degree: 机械臂关节角度, 单位:度
+        :param int joint_number: 机械臂关节编号 1~6
+        :param int speed_percentage: 机械臂关节运动速度百分比 1~100
+        :param float joint_degree: 机械臂关节角度, 单位:度
         
         :return success: {"command": "set_joint_angle", "status": "true"}
         :return failed: {"command": "set_joint_angle", "status": "false"}
@@ -140,8 +141,8 @@ class BlxRobotArm(object):
     def set_joint_degree_synchronize(self, *args, speed_percentage: int = 50) -> str:
         """设置机械臂所有关节角度
         
-        :param *args: 机械臂所有关节的角度 q1, q2, q3, q4, q5, q6, 单位:度
-        :param speed_percentage: 机械臂关节运动速度百分比 1~100
+        :param float args: 机械臂所有关节的角度 q1, q2, q3, q4, q5, q6, 单位(°)
+        :param int speed_percentage: 机械臂关节运动速度百分比 1~100
         
         :return success: {"command": "set_joint_angle_all_time", "status": "true"}
         :return failed: {"command": "set_joint_angle_all_time", "status": "false"}
@@ -189,7 +190,7 @@ class BlxRobotArm(object):
     def set_robot_end_tool(self, io: int, status) -> str:
         """设置机械臂末端工具状态
         
-        :param io: 机械臂末端工具编号, 1: 吸盘、2: 电动夹爪、3: 柔性夹爪
+        :param int io: 机械臂末端工具编号, 1: 吸盘、2: 电动夹爪、3: 柔性夹爪
         :param status: 
              - 编号为 1: True: 打开, False: 关闭
              - 编号为 2: 0 ~ 100 整数值
@@ -205,8 +206,8 @@ class BlxRobotArm(object):
     def set_robot_io_status(self, io: int, status: bool) -> str:
         """设置机械臂扩展 IO 口状态
         
-        :param io: 机械臂 IO 口编号, 1~4
-        :param status: 机械臂 IO 口状态, True:打开, False:关闭
+        :param int io: 机械臂 IO 口编号, 1~4
+        :param bool status: 机械臂 IO 口状态, True:打开, False:关闭
         
         :return success: {"command": "set_io_status", "status": true}
         :return failed: {"command": "set_io_status", "status": false}
@@ -221,10 +222,9 @@ class BlxRobotArm(object):
             return json.dumps({"command": "set_io_status", "status": False})
     
     def set_time_delay(self, delay_time: int) -> str:
-        """设置机械臂命令之间执行延时时间
+        """设置机械臂命令之间执行延时时间, 在顺序执行模式中, 可以通过该延时命令, 控制机械臂命令之间的执行时间间隔
         
-        在顺序执行模式中, 可以通过该延时命令, 控制机械臂命令之间的执行时间间隔
-        
+        :param int delay_time: 延时时间, 单位: ms, 范围: 0~3000
         :return success: {"command": "set_time_delay", "status": true}
         :return failed: {"command": "set_time_delay", "status": false}
         """
@@ -246,7 +246,7 @@ class BlxRobotArm(object):
     def set_robot_cmd_mode(self, mode: str = "SEQ") -> str:
         """设置机械臂命令执行模式
             
-        :params mode: SEQ(顺序执行模式)、INT(立即执行模式)
+        :param str mode: SEQ(顺序执行模式)、INT(立即执行模式)
         :return success: {"command": "set_robot_mode", "status": true}
         :return failed: {"command": "set_robot_mode", "status": false}
         """
@@ -270,8 +270,8 @@ class BlxRobotArm(object):
     def set_robot_arm_coordinate(self, *args, speed_percentage: int = 50) -> str:
         """通过末端工具坐标与姿态，控制机械臂关节运动
         
-        :param *args: 机械臂末端工具坐标与姿态: x, y, z, Rx, Py, Yz
-        :param speed_percentage: 机械臂关节运动速度百分比 1~100
+        :param float args: 传入机械臂末端工具坐标与姿态: x, y, z, Rx, Py, Yz
+        :param int speed_percentage: 机械臂关节运动速度百分比 1~100
         
         :return success: {"command": "set_joint_degree_by_coordinate", "status": true}
         :return failed: {"command": "set_joint_degree_by_coordinate", "status": false}
@@ -295,9 +295,15 @@ class BlxRobotArm(object):
     def set_move_line(self, *args, step=1) -> str:
         """机械臂末端执行直线运动
 
-        :param *args: 目标的坐标和姿态值 x,y,z,Rx,Py,Yz (mm)
+        :param float args: 目标的坐标和姿态值 (x,y,z,Rx,Py,Yz) , 单位(mm)
         :param int step: 末端的运动步长, 默认为 0.1 ~ 0.5
-        :return str: _description_
+        :return str: {"command": "set_move_l", "status": True}
+        
+        python示例代码:
+        
+        .. code-block:: python
+        
+            >>> robot.set_move_line(278.731, 0.000, 268.219, 180.000, -0.006, 0.000, step=1)
         """
         x, y, z, Rx, Py, Yz = args
         with self.communication_strategy.connect() as client:
@@ -310,9 +316,9 @@ class BlxRobotArm(object):
     def set_move_circle(self, *args, step=1) -> str:
         """机械臂末端执行圆弧运动
 
-        :return str: _description_
-        :param *args: 目标的坐标和姿态值  x_1, y_1, z_1, Rx_1, Py_1, Yz_1, x_2, y_2, z_2, Rx_2, Py_2, Yz_2 (mm)
+        :param float args: 目标的坐标和姿态值  (x_1, y_1, z_1, Rx_1, Py_1, Yz_1, x_2, y_2, z_2, Rx_2, Py_2, Yz_2), 单位 (mm)
         :param int step: 末端的运动步长, 默认为 0.1 ~ 0.5
+        :return str: {"command": "set_move_c", "status": True}
         """
         x_1, y_1, z_1, Rx_1, Py_1, Yz_1, x_2, y_2, z_2, Rx_2, Py_2, Yz_2 = args
         with self.communication_strategy.connect() as client:

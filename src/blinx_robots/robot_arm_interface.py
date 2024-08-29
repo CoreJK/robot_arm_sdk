@@ -67,7 +67,6 @@ class BlxRobotArm(object):
         try:
             with self.communication_strategy.connect() as client:
                 while self.thread_work_flag:
-                    time.sleep(0.1)
                     recv_data = client.recv(1024).decode('utf-8')
                     # logger.debug(f"接收数据: {recv_data.strip()}")
                     # 放入队列前, 将粘包的数据进行处理
@@ -404,7 +403,6 @@ class BlxRobotArm(object):
         """获取机械臂命令执行结果"""
         get_command_response = False
         while not get_command_response:
-            time.sleep(0.1)
             if not self.recv_data_buffer.empty():
                 data = self.recv_data_buffer.get()
                 if command_name in data:

@@ -1,6 +1,7 @@
 # -*- coding:utf-8 -*-
 import time
 import json
+from functools import wraps
 from queue import Queue
 from concurrent.futures import ThreadPoolExecutor
 
@@ -14,11 +15,21 @@ class BlxRobotArm(object):
     def __init__(self, communication_strategy):
         self.thread_work_flag = True
         self.robot_cmd_model = "SEQ"
+        self.seq_number = 0                    # 发送命令的序列号
+        self.last_seq_number = None            # 记录上一次发送的命令序列号
         self.recv_data_buffer = Queue()
         self.command_queue = Queue()
         self.task_executor = ThreadPoolExecutor(max_workers=10)
         self.communication_strategy = communication_strategy
 
+    def add_seq_number(func):
+        """用于给命令添加序号"""
+        @wraps(func)
+        def wrapper(self, *args, **kwargs):
+            self.seq_number += 1
+            return func(self, *args, **kwargs)
+        return wrapper
+    
     def set_communication_strategy(self, communication_strategy) -> None:
         """设置机械臂的不同连接方式
 
@@ -56,11 +67,39 @@ class BlxRobotArm(object):
                 try:
                     with self.communication_strategy.connect() as client:
                         command = self.command_queue.get()
-                        logger.debug(f"发送命令: {command.strip()}")
-                        client.sendall(command.encode('utf-8'))
+                        
+                        include_seq_command = json.loads(command)
+                        # TODO: 如果当前命令的序列号与上一次的命令序列号相同, 则重新发送
+                        if include_seq_command.get('seq'):
+                            # 发送命令前, 记录命令中的序列号
+                            self.last_seq_number = include_seq_command.pop('seq')
+                        
+                            exculde_seq_command = json.dumps(include_seq_command).replace(' ', '').strip() + '\r\n'
+                            logger.debug(f"发送命令: {exculde_seq_command.strip()}")
+                        
+                            client.sendall(exculde_seq_command.encode('utf-8'))
+                        else:
+                            logger.debug(f"发送命令: {command.strip()}")
+                            client.sendall(command.encode('utf-8'))
+                            
                 except Exception as e:
                     logger.error(f"发送命令失败: {e}")
                     self.thread_work_flag = False
+    
+    def filter_joint_angle_coordinate_data(self, recv_data: str) -> str:
+        """过滤掉机械臂返回的关节角度数据"""
+        
+        def filter_condition(data):
+            
+            if "get_joint_angel_all" in data:
+                return False
+            elif "get_coordinate" in data:
+                return False
+            else:
+                return True
+        logger.debug(f"过滤前的机械臂回传数据: {recv_data}")    
+        
+        return list(filter(filter_condition, recv_data))
     
     def command_receiver(self) -> None:
         """接收机械臂返回信息的线程"""
@@ -71,8 +110,11 @@ class BlxRobotArm(object):
                     # logger.debug(f"接收数据: {recv_data.strip()}")
                     # 放入队列前, 将粘包的数据进行处理
                     recv_data_list = list(filter(lambda s: s and s.strip(), recv_data.split('\r\n')))
-                    for recv_data in recv_data_list:
-                        self.recv_data_buffer.put(recv_data)
+                    washed_recv_data_list = self.filter_joint_angle_coordinate_data(recv_data_list)
+                    logger.warning(f"过滤了角度与坐标的机械臂回传数据: {washed_recv_data_list}")
+                    for washed_recv_data in washed_recv_data_list:
+                        # 过滤掉角度数据和坐标数据
+                        self.recv_data_buffer.put(washed_recv_data)
                     
                     # 打印队列中的数据的长度, 用于调试
                     # logger.debug(f"接收数据队列长度: {self.recv_data_buffer.qsize()}")
@@ -80,6 +122,7 @@ class BlxRobotArm(object):
             logger.error(f"接收数据失败: {e}")
             self.thread_work_flag = False
     
+    @add_seq_number
     def set_robot_arm_init(self) -> str:
         """机械臂初始化，将机械臂关节角度归零
         
@@ -90,7 +133,7 @@ class BlxRobotArm(object):
         robot_arm_init_status = self.task_executor.submit(self.get_command_response, "set_joint_initialize")
         
         payload = [0]
-        command = json.dumps({"command": "set_joint_initialize", "data": payload}).replace(' ', "").strip() + '\r\n'
+        command = json.dumps({"seq": self.seq_number, "command": "set_joint_initialize", "data": payload}).replace(' ', "").strip() + '\r\n'
         self.command_queue.put(command)
         
         robot_arm_init_status_result = json.loads(robot_arm_init_status.result()).get('data')
@@ -98,7 +141,8 @@ class BlxRobotArm(object):
             return json.dumps({"command": "set_joint_initialize", "status": True})
         else:
             return json.dumps({"command": "set_joint_initialize", "status": False})
-        
+    
+    @add_seq_number
     def set_joint_degree_by_number(self, joint_number: int, speed_percentage: int, joint_degree: float) -> str:
         """设置指定的机械臂关节角度
         
@@ -111,7 +155,7 @@ class BlxRobotArm(object):
         """
         get_command_response_status = self.task_executor.submit(self.get_command_response, "move_in_place")
         payload = [joint_number, speed_percentage, joint_degree]
-        command = json.dumps({"command": "set_joint_angle", "data": payload}).replace(' ', "").strip() + '\r\n'
+        command = json.dumps({"seq": self.seq_number, "command": "set_joint_angle", "data": payload}).replace(' ', "").strip() + '\r\n'
         self.command_queue.put(command)
         
         get_command_response_status_result = json.loads(get_command_response_status.result()).get('data')
@@ -120,6 +164,7 @@ class BlxRobotArm(object):
         else:
             return json.dumps({"command": "set_joint_angle", "status": False})
     
+    @add_seq_number
     def set_robot_arm_home(self) -> str:
         """机械臂回零
         
@@ -127,7 +172,7 @@ class BlxRobotArm(object):
         :return failed: {"command": "set_robot_arm_home", "status": "false"}
         """
         robot_arm_to_home_status = self.task_executor.submit(self.get_command_response, "move_in_place")
-        command = json.dumps({"command": "set_joint_angle_all", "data": [100, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}).replace(' ', "").strip() + '\r\n'
+        command = json.dumps({"seq": self.seq_number, "command": "set_joint_angle_all", "data": [100, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]}).replace(' ', "").strip() + '\r\n'
         self.command_queue.put(command)
         logger.warning("机械臂回零!")
         
@@ -137,6 +182,7 @@ class BlxRobotArm(object):
         else:
             return json.dumps({"command": "set_robot_arm_home", "status": False})
     
+    @add_seq_number
     def set_joint_degree_synchronize(self, *args, speed_percentage: int = 50) -> str:
         """设置机械臂所有关节角度
         
@@ -151,7 +197,7 @@ class BlxRobotArm(object):
             joints_degree = list(args)
             payload = [speed_percentage]
             payload.extend(joints_degree)
-            command = json.dumps({"command": "set_joint_angle_all_time", "data": payload}).replace(' ', "").strip() + '\r\n'
+            command = json.dumps({"seq": self.seq_number, "command": "set_joint_angle_all_time", "data": payload}).replace(' ', "").strip() + '\r\n'
             self.command_queue.put(command)
             
             set_joint_angle_all_time_status_result = json.loads(set_joint_angle_all_time_status.result()).get('data')
@@ -163,17 +209,19 @@ class BlxRobotArm(object):
             logger.error("关节超出范围!")
             return json.dumps({"command": "set_joint_angle_all_time", "status": False})
     
+    @add_seq_number
     def set_robot_arm_joint_stop(self) -> str:
         """机械臂关节停止运动, 与紧急停止不同，不需要重新初始化
 
         :return success: {"command": "set_joint_stop", "status": "true"}
         """
         with self.communication_strategy.connect() as client:
-            command = json.dumps({"command": "set_joint_stop", "data": [0]}).replace(' ', "").strip() + '\r\n'
+            command = json.dumps({"seq": self.seq_number, "command": "set_joint_stop", "data": [0]}).replace(' ', "").strip() + '\r\n'
             client.send(command.encode('utf-8'))
             logger.warning("机械臂停止!")
         return json.dumps({"command": "set_robot_arm_joint_stop", "status": True})
     
+    @add_seq_number
     def set_robot_arm_emergency_stop(self) -> str:
         """机械臂紧急停止
         
@@ -181,11 +229,12 @@ class BlxRobotArm(object):
         """
         # 需要立即执行的命令，不需要等待命令执行结果, 也不通过命令发送线程发送
         with self.communication_strategy.connect() as client:
-            command = json.dumps({"command": "set_joint_emergency_stop", "data": [0]}).replace(' ', "").strip() + '\r\n'
+            command = json.dumps({"seq": self.seq_number, "command": "set_joint_emergency_stop", "data": [0]}).replace(' ', "").strip() + '\r\n'
             client.send(command.encode('utf-8'))
             logger.warning("机械臂紧急停止!")
         return json.dumps({"command": "set_joint_emergency_stop", "status": True})
     
+    @add_seq_number
     def set_robot_end_tool(self, io: int, status) -> str:
         """设置机械臂末端工具状态
         
@@ -198,10 +247,11 @@ class BlxRobotArm(object):
         :return success: {"command": "set_end_tool", "status": true}
         """
         with self.communication_strategy.connect() as client:
-            command = json.dumps({"command": "set_end_tool", "data": [io, status]}).replace(' ', "").strip() + '\r\n'
+            command = json.dumps({"seq": self.seq_number, "command": "set_end_tool", "data": [io, status]}).replace(' ', "").strip() + '\r\n'
             client.send(command.encode('utf-8'))
         return json.dumps({"command": "set_end_tool", "status": True})
     
+    @add_seq_number
     def set_robot_io_status(self, io: int, status: bool) -> str:
         """设置机械臂扩展 IO 口状态
         
@@ -212,7 +262,7 @@ class BlxRobotArm(object):
         :return failed: {"command": "set_io_status", "status": false}
         """
         io_status = self.task_executor.submit(self.get_command_response, "set_robot_io_interface")
-        command = json.dumps({"command": "set_robot_io_interface", "data": [io, status]}).replace(' ', "").strip() + '\r\n'
+        command = json.dumps({"seq": self.seq_number, "command": "set_robot_io_interface", "data": [io, status]}).replace(' ', "").strip() + '\r\n'
         self.command_queue.put(command)
         io_status_result = json.loads(io_status.result()).get('data')
         if io_status_result == 'true':
@@ -220,6 +270,7 @@ class BlxRobotArm(object):
         else:
             return json.dumps({"command": "set_io_status", "status": False})
     
+    @add_seq_number
     def set_time_delay(self, delay_time: int) -> str:
         """设置机械臂命令之间执行延时时间, 在顺序执行模式中, 可以通过该延时命令, 控制机械臂命令之间的执行时间间隔
         
@@ -232,7 +283,7 @@ class BlxRobotArm(object):
             # 限制延时时间范围
             if 0 <= delay_time <= 3000:
                 # 获取命令执行结果
-                command = json.dumps({"command": "set_time_delay", "data": [delay_time]}).replace(' ', "").strip() + '\r\n'
+                command = json.dumps({"seq": self.seq_number, "command": "set_time_delay", "data": [delay_time]}).replace(' ', "").strip() + '\r\n'
                 self.command_queue.put(command)
                 return json.dumps({"command": "set_time_delay", "status": True})
             else:
@@ -241,7 +292,8 @@ class BlxRobotArm(object):
         else:
             logger.error("INT 顺序模式不支持设置延时时间!")
             return json.dumps({"command": "set_time_delay", "status": False})
-            
+    
+    @add_seq_number        
     def set_robot_cmd_mode(self, mode: str = "SEQ") -> str:
         """设置机械臂命令执行模式
             
@@ -251,7 +303,7 @@ class BlxRobotArm(object):
         """
         set_cmd_mode_thread = self.task_executor.submit(self.get_command_response, "set_robot_mode")
         
-        command = json.dumps({"command": "set_robot_mode", "data": [mode]}).replace(' ', "").strip() + '\r\n'
+        command = json.dumps({"seq": self.seq_number, "command": "set_robot_mode", "data": [mode]}).replace(' ', "").strip() + '\r\n'
         self.command_queue.put(command)
         
         set_cmd_mode_status = json.loads(set_cmd_mode_thread.result()).get('data')
@@ -266,6 +318,7 @@ class BlxRobotArm(object):
             logger.error(f"机械臂命令执行模式设置失败!")
             return json.dumps({"command": "set_robot_mode", "status": False})
 
+    @add_seq_number
     def set_robot_arm_coordinate(self, *args, speed_percentage: int = 50) -> str:
         """通过末端工具坐标与姿态，控制机械臂关节运动
         
@@ -280,7 +333,7 @@ class BlxRobotArm(object):
         logger.info("坐标控制机械臂关节运动!")
         set_robot_arm_coordinate_thread = self.task_executor.submit(self.get_command_response, "set_coordinate")
         
-        command = json.dumps({"command": "set_coordinate", "data": [speed_percentage, x, y, z, Rx, Py, Yz]}).replace(' ', "").strip() + '\r\n'
+        command = json.dumps({"seq": self.seq_number, "command": "set_coordinate", "data": [speed_percentage, x, y, z, Rx, Py, Yz]}).replace(' ', "").strip() + '\r\n'
         self.command_queue.put(command)
         
         set_cmd_mode_status = json.loads(set_robot_arm_coordinate_thread.result()).get('data')
@@ -291,6 +344,7 @@ class BlxRobotArm(object):
             logger.error("坐标控制机械臂关节运动失败!")
             return json.dumps({"command": "set_robot_arm_coordinate", "status": False})
 
+    @add_seq_number
     def set_move_line(self, *args, step=1) -> str:
         """机械臂末端执行直线运动
 
@@ -306,12 +360,13 @@ class BlxRobotArm(object):
         """
         x, y, z, Rx, Py, Yz = args
         with self.communication_strategy.connect() as client:
-            command = json.dumps({"command": "set_move_l", "data": [step, x, y, z, Rx, Py, Yz]}).replace(' ', "").strip() + '\r\n'
+            command = json.dumps({"seq": self.seq_number, "command": "set_move_l", "data": [step, x, y, z, Rx, Py, Yz]}).replace(' ', "").strip() + '\r\n'
             client.send(command.encode('utf-8'))
             logger.warning("机械臂直线运动中...")
             logger.debug(f"{command}")
         return json.dumps({"command": "set_move_l", "status": True})
     
+    @add_seq_number
     def set_move_circle(self, *args, step=1) -> str:
         """机械臂末端执行圆弧运动
 
@@ -321,12 +376,13 @@ class BlxRobotArm(object):
         """
         x_1, y_1, z_1, Rx_1, Py_1, Yz_1, x_2, y_2, z_2, Rx_2, Py_2, Yz_2 = args
         with self.communication_strategy.connect() as client:
-            command = json.dumps({"command": "set_move_c", "data": [step, x_1, y_1, z_1, Rx_1, Py_1, Yz_1, x_2, y_2, z_2, Rx_2, Py_2, Yz_2]}).replace(' ', "").strip() + '\r\n'
+            command = json.dumps({"seq": self.seq_number, "command": "set_move_c", "data": [step, x_1, y_1, z_1, Rx_1, Py_1, Yz_1, x_2, y_2, z_2, Rx_2, Py_2, Yz_2]}).replace(' ', "").strip() + '\r\n'
             client.send(command.encode('utf-8'))
             logger.warning("机械臂圆弧运动中...")
             logger.debug(f"{command}")
         return json.dumps({"command": "set_move_c", "status": True})
     
+    @add_seq_number
     def set_robot_arm_coordinate_teach(self, axis: int, direction: int, speed: float, distance: float) -> str:
         """机械臂坐标示教, 可适配摇杆以及按钮长按控制
         
@@ -337,12 +393,13 @@ class BlxRobotArm(object):
         :return str: {"command": "set_coordinate_teach", "status": True}
         """
         with self.communication_strategy.connect() as client:
-            command = json.dumps({"command": "set_coordinate_teach", "data": [axis, direction, speed, distance]}).replace(' ', "").strip() + '\r\n'
+            command = json.dumps({"seq": self.seq_number, "command": "set_coordinate_teach", "data": [axis, direction, speed, distance]}).replace(' ', "").strip() + '\r\n'
             client.send(command.encode('utf-8'))
             logger.warning("机械臂示教中...")
             logger.debug(f"{command}")
         return json.dumps({"command": "set_robot_arm_coordinate_teach", "status": True})
     
+    @add_seq_number
     def get_joint_degree_all(self) -> dict:
         """获取机械臂所有关节角度
         
@@ -350,7 +407,7 @@ class BlxRobotArm(object):
         """
         before_joint_data_temp = {}
         with self.communication_strategy.connect() as client:
-            command = json.dumps({"command": "get_joint_angle_all"}).replace(' ', "").strip() + '\r\n'
+            command = json.dumps({"seq": self.seq_number, "command": "get_joint_angle_all"}).replace(' ', "").strip() + '\r\n'
             client.sendall(command.encode('utf-8'))
             try:
                 recv_data = json.loads(client.recv(1024).decode('utf-8'))
@@ -364,16 +421,19 @@ class BlxRobotArm(object):
                 return before_joint_data_temp
         return recv_data
     
+    @add_seq_number
     def get_robot_cmd_mode(self) -> str:
         """获取机械臂命令执行模式
         
         :return: {"command": "get_robot_mode", "data": "SEQ"}
         """
         robot_cmd_mode = self.task_executor.submit(self.get_command_response, "get_robot_mode")
-        get_cmd_mode_payload = json.dumps({"command": "get_robot_mode"}).replace(' ', "") + '\r\n'
+        get_cmd_mode_payload = json.dumps({"seq": self.seq_number, "command": "get_robot_mode"}).replace(' ', "") + '\r\n'
         self.command_queue.put(get_cmd_mode_payload)
-        return robot_cmd_mode.result()
-             
+        result = robot_cmd_mode.result()
+        return result
+    
+    @add_seq_number
     def get_robot_coordinate(self) -> str:
         """获取机械臂正解
         
@@ -383,7 +443,7 @@ class BlxRobotArm(object):
         # 计算机械臂正解
         before_coordinate_data_temp = {}
         with self.communication_strategy.connect() as client:
-            command = json.dumps({"command": "get_coordinate"}).replace(' ', "").strip() + '\r\n'
+            command = json.dumps({"seq": self.seq_number, "command": "get_coordinate"}).replace(' ', "").strip() + '\r\n'
             client.sendall(command.encode('utf-8'))
             try:
                 recv_data = json.loads(client.recv(1024).decode('utf-8')).get('data')
@@ -409,15 +469,16 @@ class BlxRobotArm(object):
                     response = data
                     get_command_response = True
                     break
-                
+                else:
+                    logger.warning(f"没有找到指定的返回结果: {data}")
         return response
     
     
 if __name__ == "__main__":
     try:
         # 连接机械臂
-        host = "192.168.10.78"
-        port = 1234
+        host = "192.168.10.107"
+        port = 4196
         socket_communication = SocketCommunication(host, port)
         robot = BlxRobotArm(socket_communication)
         

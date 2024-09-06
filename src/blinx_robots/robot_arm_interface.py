@@ -90,7 +90,12 @@ class BlxRobotArm(object):
         """过滤掉机械臂返回的关节角度数据"""
         
         def filter_condition(data):
-            json_data = json.loads(data)
+            # 返回的数据如果不为标准的 json 数据，默认不处理
+            try:
+                json_data = json.loads(data)
+            except json.JSONDecodeError:
+                return True
+            
             if json_data.get('return') == 'get_joint_angle_all':
                 return False
             elif json_data.get('return') == 'get_coordinate':

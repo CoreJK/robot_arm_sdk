@@ -3,7 +3,18 @@ import copy
 import logging
 import logging.handlers
 
-__all__ = ['_log']
+__all__ = ['logger', 'set_stream_level', 'set_file_level', 'disable_logging']
+
+
+# 日志等级映射
+LEVELS = {
+    'DEBUG': logging.DEBUG,
+    'INFO': logging.INFO,
+    'WARNING': logging.WARNING,
+    'ERROR': logging.ERROR,
+    'CRITICAL': logging.CRITICAL
+}
+
 
 class ColorfulFormatter(logging.Formatter):
     """终端显示日志的格式化器"""
@@ -51,4 +62,20 @@ logger.addHandler(stream_handler)
 file_handler = logging.handlers.RotatingFileHandler('blinx_robot_arm.log', maxBytes=1024*1024, backupCount=5, encoding='utf-8')
 file_handler.setFormatter(LoggerFileFormatter(FORMAT))  # 日志格式化器
 logger.addHandler(file_handler)
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
+
+
+def set_stream_level(level_str='INFO'):
+    """设置终端日志处理器的日志等级"""
+    level = LEVELS.get(level_str.upper(), logging.INFO)
+    stream_handler.setLevel(level)
+
+def set_file_level(level_str='INFO'):
+    """设置文件日志处理器的日志等级"""
+    level = LEVELS.get(level_str.upper(), logging.DEBUG)
+    file_handler.setLevel(level)
+
+def disable_logging(level_str='CRITICAL'):
+    """禁用指定等级及以下的日志输出"""
+    level = LEVELS.get(level_str.upper(), logging.CRITICAL)
+    logging.disable(level)

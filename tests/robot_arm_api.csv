@@ -1,0 +1,1328 @@
+user_content,assistant_content
+"1号机械臂设备的IP和端口为192.168.1.254:1234，2号机械臂设备的IP和端口为192.168.1.100:5000，断开与1号机械臂的连接后再连接2号机械臂。
+","```python
+# 连接1号机械臂设备
+socket_communication_1 = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm_1 = RobotArm(socket_communication_1)
+robot_arm_1.start_communication()
+
+# 断开与1号机械臂设备的连接
+robot_arm_1.end_communication()
+
+# 连接2号机械臂设备
+socket_communication_2 = SocketCommunication(host=""192.168.1.100"", port=5000)
+robot_arm_2 = RobotArm(socket_communication_2)
+robot_arm_2.start_communication()
+
+# 断开与2号机械臂设备的连接
+robot_arm_2.end_communication()
+```"
+对机械臂设备进行初始化。,"```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 机械臂设备初始化
+robot_arm.set_robot_arm_init()
+time.sleep(8)
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+将机械臂所有关节回零。,"```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 机械臂所有关节回零
+robot_arm.set_robot_arm_home()
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+将机械臂设备第2关节的角度设置为30度。,"```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 将机械臂设备第2关节的角度设置为30度
+robot_arm.set_joint_degree_by_number(2, 50, 30.0)
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+将机械臂设备第5关节的角度设置为90度。,"```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 将机械臂第5关节的角度设置为90度
+robot_arm.set_joint_degree_by_number(5, 50, 90.0)
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+将机械臂设备第1关节的角度设置为45度，关节运动速度百分比设置为80%。,"```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 将机械臂设备第1关节的角度设置为45度，关节运动速度百分比设置为80%。
+robot_arm.set_joint_degree_by_number(1, 80, 45.0)
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+将机械臂设备第3关节的角度设置为-120度，关节运动速度百分比设置为20%。,"```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 将机械臂第3关节的角度设置为-120度，同时将关节运动速度百分比设置为20%
+robot_arm.set_joint_degree_by_number(3, 20, -120.0)
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+将机械臂设备各个关节的角度值分别设置为60、-75、-45、120、-180、300。,"```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 同步设置机械臂各关节角度
+joint_angles = [60, -75, -45, 120, -180, 300]
+robot_arm.set_joint_degree_synchronize(*joint_angles, speed_percentage=50)
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+将机械臂设备各个关节的角度值分别设置为90、-50、-60、60、-75、-120，关节运动速度百分比设置为30%。,"```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 同步设置机械臂各关节角度，并设置关节运动速度百分比为30%
+joint_angles = [90, -50, -60, 60, -75, -120]
+robot_arm.set_joint_degree_synchronize(*joint_angles, speed_percentage=30)
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+将机械臂设备各个关节的角度值分别设置为20、40、60、80、100、120，关节运动速度百分比设置为80%。,"```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 同步设置机械臂各关节角度，并设置关节运动速度百分比为80%
+joint_angles = [20, 40, 60, 80, 100, 120]
+robot_arm.set_joint_degree_synchronize(*joint_angles, speed_percentage=80)
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+设置机械臂设备紧急停止。,"```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 机械臂设备动作控制...
+
+# 机械臂设备紧急停止
+robot_arm.set_robot_arm_emergency_stop()
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+将机械臂设备各个关节的角度值分别设置为60、-60、-60、60、-60、60，并在1秒后执行机械臂紧急停止。,"```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 同步设置机械臂各关节角度
+joint_angles = [60, -60, -60, 60, -60, 60]
+robot_arm.set_joint_degree_synchronize(*joint_angles, speed_percentage=50)
+time.sleep(1)
+
+# 机械臂设备紧急停止
+robot_arm.set_robot_arm_emergency_stop()
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+打开机械臂设备上的1号末端工具，并在3秒后关闭。,"```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 打开机械臂1号末端工具，并在3秒后关闭
+robot_arm.set_robot_end_tool(1, True)
+time.sleep(3)
+robot_arm.set_robot_end_tool(1, False)
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+先将机械臂设备各个关节的角度值分别设置为0、25、0、0、-25、0，再打开1号末端工具，并在5秒后关闭。,"```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 同步设置机械臂各关节角度
+joint_angles = [0, 25, 0, 0, -25, 0]
+robot_arm.set_joint_degree_synchronize(*joint_angles, speed_percentage=50)
+
+# 打开机械臂1号末端工具，并在5秒后关闭
+robot_arm.set_robot_end_tool(1, True)
+time.sleep(5)
+robot_arm.set_robot_end_tool(1, False)
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+先将机械臂设备各个关节的角度值分别设置为0、25、0、0、-25、0，再打开1号末端工具，之后将各个关节的角度值分别设置为90、0、0、0、0、0，最后再关闭末端工具。,"```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 同步设置机械臂各关节角度为[0, 25, 0, 0, -25, 0]
+joint_angles = [0, 25, 0, 0, -25, 0]
+robot_arm.set_joint_degree_synchronize(*joint_angles, speed_percentage=50)
+
+# 打开机械臂1号末端工具
+robot_arm.set_robot_end_tool(1, True)
+
+# 同步设置机械臂各关节角度为[90, 0, 0, 0, 0, 0]
+joint_angles = [90, 0, 0, 0, 0, 0]
+robot_arm.set_joint_degree_synchronize(*joint_angles, speed_percentage=50)
+
+# 关闭1号末端工具
+robot_arm.set_robot_end_tool(1, False)
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+打开机械臂设备上的2号扩展IO口，并在3秒后关闭。,"```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 打开机械臂2号扩展IO口，并在3秒后关闭
+robot_arm.set_robot_io_status(2, True)
+time.sleep(3)
+robot_arm.set_robot_io_status(2, False)
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+"打开机械臂设备上的所有扩展IO口,并在5秒后关闭。","```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 打开机械臂上的所有扩展IO口
+for i in range(4):
+    robot_arm.set_robot_io_status(i + 1, True)
+
+# 在5秒后关闭所有扩展IO口
+time.sleep(5)
+for i in range(4):
+    robot_arm.set_robot_io_status(i + 1, False)
+    
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+"依次打开机械臂设备上的1号末端工具和3号扩展IO口,并在3秒后依次关闭,同时设置命令执行之间的时间间隔为3秒。","```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 打开机械臂1号末端工具
+robot_arm.set_robot_end_tool(1, True)
+robot_arm.set_time_delay(3000)
+
+# 打开3号扩展IO口
+robot_arm.set_robot_io_status(3, True)
+robot_arm.set_time_delay(3000)
+
+# 关闭1号末端工具
+robot_arm.set_robot_end_tool(1, False)
+robot_arm.set_time_delay(3000)
+
+# 关闭3号扩展IO口
+robot_arm.set_robot_io_status(3, False)
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+将机械臂的命令执行模式设置为立即执行模式。,"```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 设置机械臂命令执行模式
+robot_arm.set_robot_cmd_mode(""INT"")
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+将机械臂的命令执行模式设置为立即执行模式后，再将各个关节的角度值分别设置为0、25、0、0、-25、0，之后打开1号末端工具，最后将机械臂回零并关闭末端工具。,"```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 设置机械臂命令执行模式
+robot_arm.set_robot_cmd_mode(""INT"")
+
+# 同步设置机械臂各关节角度
+joint_angles = [0, 25, 0, 0, -25, 0]
+robot_arm.set_joint_degree_synchronize(*joint_angles, speed_percentage=50)
+
+# 打开1号末端工具
+robot_arm.set_robot_end_tool(1, True)
+
+# 机械臂所有关节回零并关闭末端工具
+robot_arm.set_robot_arm_home()
+robot_arm.set_robot_end_tool(1, False)
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+将机械臂末端工具的坐标与姿态分别设置为330、0、160、180、0、0。,"```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 设置机械臂末端工具的坐标与姿态
+coordinates = [330, 0, 160, 180, 0, 0]
+robot_arm.set_robot_arm_coordinate(*coordinates, speed_percentage=50)
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+将机械臂末端工具的坐标与姿态分别设置为180、250、140、180、0、0，关节运动速度百分比设置为80%。,"```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 设置机械臂末端工具的坐标与姿态
+coordinates = [180, 250, 140, 180, 0, 0]
+robot_arm.set_robot_arm_coordinate(*coordinates, speed_percentage=80)
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+将机械臂的命令执行模型设置为顺序执行模式后，再将末端工具的坐标与姿态分别设置为330、0、160、180、0、0，之后打开1号末端工具，再将末端工具的坐标与姿态分别设置为180、250、140、180、0、0，最后关闭末端工具。,"```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 设置机械臂命令执行模式
+robot_arm.set_robot_cmd_mode(""SEQ"")
+
+# 设置机械臂末端工具的坐标与姿态
+coordinates_1 = (330, 0, 160, 180, 0, 0)
+robot_arm.set_robot_arm_coordinate(*coordinates_1, speed_percentage=50)
+
+# 打开机械臂1号末端工具
+robot_arm.set_robot_end_tool(1, True)
+
+# 设置机械臂末端工具的坐标与姿态，进行第二次移动
+coordinates_2 = (180, 250, 140, 180, 0, 0)
+robot_arm.set_robot_arm_coordinate(*coordinates_2, speed_percentage=50)
+
+# 关闭1号末端工具
+robot_arm.set_robot_end_tool(1, False)
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+获取当前状态下机械臂所有关节的角度。,"```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 获取当前状态下机械臂所有关节的角度
+joint_degree_all = robot_arm.get_joint_degree_all().get(""data"")
+print(joint_degree_all)
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+获取当前状态下机械臂所有关节的角度，并将各个关节的角度增加10度。,"```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 获取当前状态下机械臂所有关节的角度
+joint_degree_all = robot_arm.get_joint_degree_all().get(""data"")
+print(joint_degree_all)
+
+# 将各个关节的角度增加10度
+joint_degree_all_new = [degree + 10 for degree in joint_degree_all]
+robot_arm.set_joint_degree_synchronize(*joint_degree_all_new, speed_percentage=50)
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+获取当前状态下机械臂的命令执行模式。,"```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 获取当前状态下机械臂的命令执行模式
+get_cmd_mode_result = robot_arm.get_robot_cmd_mode()
+cmd_mode = json.loads(get_cmd_mode_result).get(""data"")
+print(cmd_mode)
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+获取当前状态下机械臂的命令执行模式，并将其切换为另一种模式。,"```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 获取当前状态下机械臂的命令执行模式
+get_cmd_mode_result = robot_arm.get_robot_cmd_mode()
+cmd_mode = json.loads(get_cmd_mode_result).get(""data"")
+print(cmd_mode)
+
+# 将当前模式切换为另一种模式
+if cmd_mode == ""SEQ"":
+    cmd_mode_new = ""INT""
+else:
+    cmd_mode_new = ""SEQ""
+robot_arm.set_robot_cmd_mode(cmd_mode_new)
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+获取当前状态下机械臂各关节正解。,"```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 获取当前状态下机械臂各关节正解
+get_coordinate_result = robot_arm.get_robot_coordinate()
+coordinate = json.loads(get_coordinate_result).get(""data"")
+print(coordinate)
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+先将机械臂设备各个关节的角度值分别设置为0、25、0、0、-25、0，再获取机械臂各关节正解。,"```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 同步设置机械臂各关节角度
+joint_angles = [0, 25, 0, 0, -25, 0]
+robot_arm.set_joint_degree_synchronize(*joint_angles, speed_percentage=50)
+
+# 获取当前状态下机械臂各关节正解
+get_coordinate_result = robot_arm.get_robot_coordinate()
+coordinate = json.loads(get_coordinate_result).get(""data"")
+print(coordinate)
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+机械臂末端工具以坐标(244.5，0，268.22，180，0，0)为起点，画一个边长为5cm的正方形。,"```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 机械臂回零
+robot_arm.set_robot_arm_home()
+# 画一个边长为5cm的正方形
+robot_arm.set_robot_arm_coordinate(244.5, 0.000, 268.219, 180.000, 0.000, 0.000, speed_percentage=100)
+time.sleep(1)
+robot_arm.set_robot_arm_coordinate(294.5, 0.000, 268.219, 180.000, 0.000, 0.000, speed_percentage=100)
+time.sleep(1)
+robot_arm.set_robot_arm_coordinate(294.5, -50.000, 268.219, 180.000, 0.000, 0.000, speed_percentage=100)
+time.sleep(1)
+robot_arm.set_robot_arm_coordinate(244.5, -50.000, 268.219, 180.000, 0.000, 0.000, speed_percentage=100)
+time.sleep(1)
+robot_arm.set_robot_arm_coordinate(244.5, 0.000, 268.219, 180.000, 0.000, 0.000, speed_percentage=100)
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+"机械臂末端工具以坐标(244.5，0，268.22，180, 0, 0)为圆心，画一个半径为5cm的圆。","```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 机械臂回零
+robot_arm.set_robot_arm_home()
+# 画一个半径为5cm的圆
+c = json.loads(robot.get_robot_coordinate()).get(""data"")
+x, y, z, xx, yy, zz = c
+R = 50
+theta = 0
+x_o = x + 50
+robot_arm.set_robot_arm_coordinate(x_o, y, z, xx, yy, zz, speed_percentage=100)
+
+for i in range(1, 91):
+    theta = i * np.pi / 180
+    y_new = y - R * np.sin(theta)
+    x_new = x + (R * np.cos(theta))
+    robot_arm.set_robot_arm_coordinate(x_new, y_new, z, xx, yy, zz, speed_percentage=100)
+    print(x_new, y_new)
+
+for i in range(91, 181):
+    theta = (i-90) * np.pi / 180
+    x_new = x - (R * np.sin(theta))
+    y_new = y - (R * np.cos(theta))
+    robot_arm.set_robot_arm_coordinate(x_new, y_new, z, xx, yy, zz, speed_percentage=100)
+    print(x_new, y_new)
+
+for i in range(181, 271):
+    theta = (i-180) * np.pi / 180
+    x_new = x - (R * np.cos(theta))
+    y_new = y + (R * np.sin(theta))
+    robot_arm.set_robot_arm_coordinate(x_new, y_new, z, xx, yy, zz, speed_percentage=100)
+    print(x_new, y_new)
+
+for i in range(271, 361):
+     theta = (i-270) * np.pi / 180
+     x_new = x + (R * np.sin(theta))
+     y_new = y + (R * np.cos(theta))
+     robot_arm.set_robot_arm_coordinate(x_new, y_new, z, xx, yy, zz, speed_percentage=100)
+      print(x_new, y_new)
+
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+"机械臂末端工具以初始坐标(244.5, 0, 268.219, 180.000, 0.000, 0.000)为起点，画一条长度为20cm的直线。","```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 机械臂回零
+robot_arm.set_robot_arm_home()
+bias = [-100, 100]
+for i in bias:
+    robot_arm.set_robot_arm_coordinate(244.5, i, 268.219, 180.000, 0.000, 0.000, speed_percentage=100)
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+机械臂末端工具以坐标(294.5，50，268.22，180，0，0)为起点，画一个边长为5cm的正方形。,"```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 机械臂回零
+robot_arm.set_robot_arm_home()
+# 画一个边长为5cm的正方形
+robot_arm.set_robot_arm_coordinate(294.5, -50.000, 268.219, 180.000, -0.006, 0.000, speed_percentage=100)
+time.sleep(1)
+robot_arm.set_robot_arm_coordinate(294.5, -100.000, 268.219, 180.000, -0.006, 0.000, speed_percentage=100)
+time.sleep(1)
+robot_arm.set_robot_arm_coordinate(244.5, -100.000, 268.219, 180.000, -0.006, 0.000, speed_percentage=100)
+time.sleep(1)
+robot_arm.set_robot_arm_coordinate(244.5, -50.000, 268.219, 180.000, -0.006, 0.000, speed_percentage=100)
+time.sleep(1)
+robot_arm.set_robot_arm_coordinate(294.5, -50.000, 268.219, 180.000, -0.006, 0.000, speed_percentage=100)
+
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+机械臂垂直向上伸直到极限位置。,"```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 机械臂垂直向上伸直到极限位置
+robot_arm.set_joint_degree_by_number(3, 50, -90)
+robot_arm.set_joint_degree_by_number(5, 50, -90)
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+机械臂向前伸直到极限位置。,"```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 机械臂向前伸直到极限位置
+degree = [0, 90, -90, 0, -90, 0]
+robot_arm.set_joint_degree_synchronize(*degree, speed_percentage=50)
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+将机械臂末端工具逆时针旋转120度，关节运动速度百分比设置为100%。,"```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 将机械臂末端工具逆时针旋转120度，关节运动速度百分比设置为100%
+robot_arm.set_joint_degree_by_number(6, 100, 120)
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+"打开机械臂设备上的1号末端工具，吸取中心点位于初始位置正下方坐标为(244.5, 0, 60, 180, 0, 0)的物体，再回到初始位置并放下物体。","```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 打开机械臂1号末端工具
+robot_arm.set_robot_end_tool(1, True)
+robot_arm.set_robot_arm_coordinate(244.5, 0, 60, 180, 0, 0)
+# 机械臂回零
+robot_arm.set_robot_arm_home()
+# 关闭末端工具
+robot_arm.set_robot_end_tool(1, False)
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+"将机械臂末端工具移动到坐标(184.5, 0, 60, 180, 0, 0)处，打开1号末端工具吸取1号物体，将1号物体叠放到坐标为(244.5, 0, 110, 180, 0, 0)的2号物体上。","```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 吸取1号物体
+robot_arm.set_robot_arm_coordinate(184.5, 0, 60, 180, 0, 0, speed_percentage=100)
+robot_arm.set_robot_end_tool(1, True)
+time.sleep(1)
+# 抬升机械臂
+robot_arm.set_robot_arm_coordinate(184.5, 0.000, 268.219, 180.000, -0.006, 0.000, speed_percentage=100)
+time.sleep(1)
+# 移动到2号物体上方
+robot_arm.set_robot_arm_coordinate(244.5, 0, 268.219, 180.000, -0.006, 0.000, speed_percentage=100)
+time.sleep(1)
+# 下降机械臂
+robot_arm.set_robot_arm_coordinate(244.5, 0, 110, 180.000, -0.006, 0.000, speed_percentage=100)
+time.sleep(1)
+# 释放1号物体
+robot_arm.set_robot_end_tool(1, False)
+time.sleep(1)
+# 抬升机械臂
+robot_arm.set_robot_arm_coordinate(244.5, 0, 268.219, 180.000, -0.006, 0.000, speed_percentage=100)
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+"将机械臂末端工具移动到坐标（244.5，0，65, 180, 0, 0）处，打开1号末端工具吸取物体，再移动至坐标（200，100，75, 180, 0, 0）处释放物体。","```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 吸取目标物体
+robot_arm.set_robot_arm_coordinate(244.5, 0, 65, 180, 0, 0)
+robot_arm.set_robot_end_tool(1, True)
+time.sleep(1)
+# 抬升机械臂
+robot_arm.set_robot_arm_coordinate(244.5, 0, 268.219, 180, 0, 0)
+time.sleep(1)
+# 移动到目标位置
+robot_arm.set_robot_arm_coordinate(200, 100, 75, 180, 0, 0)
+time.sleep(1)
+# 释放目标物体
+robot_arm.set_robot_end_tool(1, False)
+        
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+"将机械臂末端工具移动到坐标（244.5，0，65, 180, 0, 0）处，打开1号末端工具吸取物体，再移动至坐标（200，-200，75, 180, 0, 0）处释放物体。","```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 吸取目标物体
+robot_arm.set_robot_arm_coordinate(244.5, 0, 65, 180, 0, 0)
+robot_arm.set_robot_end_tool(1, True)
+time.sleep(1)
+# 抬升机械臂
+robot_arm.set_robot_arm_coordinate(244.5, 0, 268.219, 180, 0, 0)
+time.sleep(1)
+# 移动到目标位置
+robot_arm.set_robot_arm_coordinate(200, -200, 75, 180, 0, 0)
+time.sleep(1)
+# 释放目标物体
+robot_arm.set_robot_end_tool(1, False)
+        
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+控制机械臂设备跳一段古典舞。,"```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 各个轴的角度、运动速度和命令执行延时参数
+degrees = []
+J1X = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 80.0, 0.0, -40.0, -40.0, 40.0, 40.0, -40.0, -80.0, -85.0, -85.0, 0.0, 80.0, 40.8, 0.3, 39.5, 87.0, 87.0, -73.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 25.0, -45.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+J2X = [35.0, 15.0, -45.0, -28.5, -28.5, -1.6, 18.4, -1.6, 8.4, -28.5, 32.0, 12.0, -47.6, -47.6, -47.6, -17.1, -37.1, -37.1, -12.8, -22.8, -22.8, -32.8, -32.8, -32.8, -11.0, -59.3, -69.3, -69.3, -69.5, -59.5, -59.5, -29.1, -28.5, -28.5, 33.7, -28.5, -38.5, -38.5, -61.5, -41.5, -61.5, -41.5, -31.5, -21.5, 3.5, 3.5, 13.5, -16.5, -36.5, -46.5, 18.4, 34.7, 18.4, 34.7, -28.4, -14.6, -28.4, -14.6, -28.4, -14.6, -28.4, 0.0]
+
+J3X = [0.0, 0.0, 17.4, 38.0, 10.0, 10.0, -35.0, -45.0, -19.7, 38.0, -54.5, -54.5, 34.5, 34.5, 34.5, 24.5, 4.5, 35.3, 4.6, 44.8, 44.9, 44.9, 44.9, 44.9, 35.0, 15.0, 35.0, 35.0, 25.0, 15.0, 15.0, 16.0, 38.0, 10.0, 10.0, 38.0, -32.0, 18.9, -24.0, -44.0, -24.0, -44.0, -54.0, -59.0, -59.0, -59.0, -39.0, -59.0, -18.5, 24.3, 29.0, 16.8, 29.0, 16.8, 11.5, 26.8, 11.5, 26.8, 11.5, 26.8, 11.5, 0.0]
+
+J4X = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 90.0, 0.0, -90.0, 0.0, 90.0, 0.0, -90.0, 0.0, 0.0, 0.0, 90.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, -90.0, 0.0, 0.0, 0.0, 0.0, 0.0, -90.0, 0.0, 0.0, 0.0, 0.0, 90.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+J5X = [-45.0, -27.9, -58.0, -103.0, -140.0, -102.5, -127.0, -91.3, -61.4, -103.0, -48.0, -32.9, -87.0, -68.9, -124.0, -82.0, -52.0, -85.0, -115.0, -125.0, -125.0, -125.0, -125.0, -125.0, -174.5, -44.5, -54.5, -54.5, -50.0, 0.0, 0.0, -70.0, -103.0, -50.0, -140.0, -103.0, -55.5, -75.5, -5.2, -5.4, -5.2, -5.4, -55.4, -55.4, -85.4, -56.0, -56.0, -56.0, -76.0, -46.0, -56.0, -136.0, -56.0, -136.0, -64.1, -150.0, -64.1, -150.0, -64.1, -150.0, -64.1, -3.92]
+
+J6X = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+
+speed = [70.0, 70.0, 70.0, 70.0, 70.0, 70.0, 70.0, 70.0, 70.0, 70.0, 70.0, 70.0, 70.0, 70.0, 70.0, 70.0, 70.0, 70.0, 70.0, 70.0, 70.0, 70.0, 70.0, 70.0, 70.0, 70.0, 70.0, 70.0, 70.0, 70.0, 70.0, 70.0, 70.0, 70.0, 70.0, 70.0, 70.0, 70.0, 70.0, 70.0, 70.0, 70.0, 70.0, 70.0, 70.0, 70.0, 60.0, 60.0, 60.0, 60.0, 60.0, 60.0, 60.0, 60.0, 60.0, 70.0, 70.0, 70.0, 70.0, 70.0, 70.0, 50.0]
+
+delay_time = [1.2, 0.8, 1.5, 1.5, 0.5, 1.3, 1.3, 1.3, 1.3, 1.3, 1.3, 1.5, 1.7, 1.7, 1.7, 1.7, 1.7, 1.7, 1.7, 1.3, 0.5, 1.3, 1.3, 1.3, 1.3, 1.3, 1.3, 1.3, 1.3, 2.5, 1.5, 1.5, 1.3, 1.5, 1.5, 1.3, 1.3, 1.5, 2.5, 0.8, 0.8, 1.0, 1.6, 1.3, 1.3, 1.3, 1.3, 1.3, 1.3, 1.3, 1.3, 1.0, 1.0, 1.0, 1.3, 1.3, 1.3, 1.3, 1.3, 1.3, 1.3, 0.0]
+
+# 执行舞蹈动作
+for i in range(len(J1X)):
+    degrees.clear()
+    degrees.append(J1X[i])
+    degrees.append(J2X[i])
+    degrees.append(J3X[i])
+    degrees.append(J4X[i])
+    degrees.append(J5X[i])
+    degrees.append(J6X[i])
+    robot_arm.set_joint_degree_synchronize(*degrees, speed_percentage=speed[i])
+    robot_arm.set_time_delay(delay_time[i])
+
+# 机械臂回零
+robot_arm.set_robot_arm_home()
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+控制机械臂设备跳一段爵士舞。,"```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 执行舞蹈动作
+robot_arm.set_joint_degree_by_number(1, 50, 45)
+time.sleep(1)
+robot_arm.set_joint_degree_by_number(2, 50, -60)
+time.sleep(1)
+robot_arm.set_joint_degree_by_number(5, 100, 20)
+time.sleep(1)
+robot_arm.set_joint_degree_by_number(5, 100, -45)
+time.sleep(1)
+robot_arm.set_joint_degree_by_number(1, 50, -45)
+time.sleep(1)
+robot_arm.set_joint_degree_by_number(3, 50, 30)
+time.sleep(1)
+robot_arm.set_joint_degree_by_number(4, 100, 120)
+time.sleep(1)
+# 机械臂回零
+robot_arm.set_robot_arm_home()
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+控制机械臂设备跳一段现代舞。,"```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 执行舞蹈动作
+robot_arm.set_joint_degree_synchronize(45, -60, 45, 180, -90, 90, speed_percentage=100)
+time.sleep(1)
+robot_arm.set_joint_degree_synchronize(-45, 60, -45, 180, -90, 0, speed_percentage=100)
+time.sleep(1.2)
+robot_arm.set_joint_degree_synchronize(-45, 60, -45, 180, 0, 0, speed_percentage=100)
+time.sleep(1.2)
+robot_arm.set_joint_degree_synchronize(0, 0, -45, 0, 0, 0, speed_percentage=100)
+time.sleep(1)
+robot_arm.set_joint_degree_synchronize(0, -45, 90, 0, 0, 0, speed_percentage=100)
+time.sleep(1)
+robot_arm.set_joint_degree_synchronize(0, -45, 90, 180, 0, 0, speed_percentage=100)
+time.sleep(1)
+# 机械臂回零
+robot_arm.set_robot_arm_home()
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+"将机械臂设备从初始位置移动到坐标(200, 80, 200, 180, 0, 0)处。","```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 机械臂回零
+robot_arm.set_robot_arm_home()
+# 移动到指定坐标处
+next_position = [200, 80, 200, 180, 0, 0]
+robot_arm.set_robot_arm_coordinate(*next_position, speed_percentage=50)
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+将机械臂设备的第一关节向左转动45度后打开机械臂的3号扩展IO口，等待5秒后关闭。,"```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 将机械臂设备向左转动45度
+robot_arm.set_joint_degree_synchronize(45, 0, 0, 0, 0, 0)
+# 打开机械臂的3号扩展IO口，等待5秒后关闭
+robot_arm.set_robot_io_status(3, True)
+time.sleep(5)
+robot_arm.set_robot_io_status(3, False)
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+将机械臂设备的第一关节向右转动45度，关节运动速度百分比为80%。,"```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+robot_arm.set_joint_degree_synchronize(-45, 0, 0, 0, 0, 0, speed_percentage=80)
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+控制机械臂设备跳一段民族舞。,"```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 执行舞蹈动作
+robot_arm.set_joint_degree_synchronize(45, -70, 45, 0, -90, 0, speed_percentage=100)
+time.sleep(0.5)
+robot_arm.set_joint_degree_synchronize(45, -70, 45, 180, -180, 0, speed_percentage=100)
+time.sleep(0.5)
+robot_arm.set_joint_degree_synchronize(45, -70, 45, 180, -90, 0, speed_percentage=100)
+time.sleep(1.2)
+robot_arm.set_joint_degree_synchronize(0, -70, 45, 180, -90, 0, speed_percentage=100)
+time.sleep(1)
+robot_arm.set_joint_degree_synchronize(0, 0, 0, 0, 0, 0, speed_percentage=100)
+time.sleep(0.5)
+robot_arm.set_joint_degree_synchronize(0, 0, -90, 0, -90, 0, speed_percentage=30)
+time.sleep(1.1)
+robot_arm.set_joint_degree_synchronize(0, -70, 45, 0, 0, 0, speed_percentage=100)
+time.sleep(1.3)
+robot_arm.set_joint_degree_synchronize(130, -70, 45, 0, 0, 0, speed_percentage=100)
+time.sleep(2)
+ robot_arm.set_joint_degree_synchronize(-130, -70, 45, 0, 0, 0, speed_percentage=100)
+ time.sleep(1)
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+获取机械臂设备当前位置的坐标，从当前坐标位置处向X轴正方向移动5cm，再向Y轴正方向移动10cm。,"```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 获取当前位置的坐标
+coordinate_json = robot_arm.get_robot_coordinate()
+coordinate = json.loads(coordinate_json).get(""data"")
+
+# 机械臂移动控制
+robot_arm.set_robot_arm_coordinate(*coordinate, speed_percentage=100)
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+获取机械臂设备当前位置的坐标，在当前坐标位置处画一个边长为5cm的正方形。,"```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 获取当前位置的坐标
+coordinate_json = robot_arm.get_robot_coordinate()
+coordinate = json.loads(coordinate_json).get(""data"")
+xx, yy, zz, Rx, Ry, Rz = coordinate
+
+# 画一个边长为5cm的正方形
+robot_arm.set_robot_arm_coordinate(xx, yy-50, zz, Rx, Ry, Rz)
+time.sleep(1)
+robot_arm.set_robot_arm_coordinate(xx-50, yy-50, zz, Rx, Ry, Rz)
+time.sleep(1)
+robot_arm.set_robot_arm_coordinate(xx-50, yy, zz, Rx, Ry, Rz)
+time.sleep(1)
+robot_arm.set_robot_arm_coordinate(xx, yy, zz, Rx, Ry, Rz)
+time.sleep(1)
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+获取机械臂设备当前位置的坐标，然后在当前坐标位置处以30%的速度向X轴正方向移动10cm，等待5秒后再以100%的速度移动回原来的位置。,"```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 获取当前位置的坐标
+coordinate_json = robot_arm.get_robot_coordinate()
+coordinate = json.loads(coordinate_json).get(""data"")
+xx, yy, zz, Rx, Ry, Rz = coordinate
+
+# 机械臂移动控制
+robot_arm.set_robot_arm_coordinate(xx+100, yy, zz, Rx, Ry, Rz,speed_percentage=30)
+time.sleep(5)
+robot_arm.set_robot_arm_coordinate(xx, yy, zz, Rx, Ry, Rz, speed_percentage=100)
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+"将机械臂第5关节的角度值设置为-90度，关节运动速度百分比设置为50%，再打开机械臂的1号末端工具，将机械臂的各个关节角度设置为(0,45,-90,0,0,0)，最后关闭末端工具。","```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 将第5关节的角度值设置为-90度，关节运动速度百分比设置为50%
+robot_arm.set_joint_degree_by_number(5, 50, -90)
+time.sleep(1)
+# 打开末端工具
+robot_arm.set_robot_end_tool(1, True)
+time.sleep(1)
+# 设置各关节角度
+robot_arm.set_joint_degree_synchronize(0, 45, -90, 0, 0, 0)
+time.sleep(1)
+# 关闭末端工具
+robot_arm.set_robot_end_tool(1, False)
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+"将机械臂第1关节以80%的速度转动45度，打开机械臂的1号末端工具，再将机械臂各个关节的角度设置为(0,45,-90,0,-90,0)，等待3秒后，将机械臂各个关节的角度设置为(-45,0,0,0,0,0)，最后将机械臂回零并关闭末端工具。","```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 将机械臂第1关节以80%的速度转动45度
+robot_arm.set_joint_degree_by_number(1, 80, 45)
+time.sleep(1)
+# 打开末端工具
+robot_arm.set_robot_end_tool(1, True)
+time.sleep(1)
+# 设置各关节角度值
+robot_arm.set_joint_degree_synchronize(0, 45, -90, 0, -90, 0)
+time.sleep(3)
+robot_arm.set_joint_degree_synchronize(-45, 0, 0, 0, 0, 0)
+time.sleep(1)
+# 机械臂回零并关闭末端工具
+robot_arm.set_robot_arm_home()
+time.sleep(8)
+robot_arm.set_robot_end_tool(1, False)
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+"将机械臂末端工具的坐标设置为(200,120,300,180,0,0)，1.2秒后，打开1号末端工具，再打开1号和3号扩展IO口，3秒后，执行机械臂回零，并关闭所有末端工具和扩展IO口。","```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 设置末端工具坐标
+robot_arm.set_robot_arm_coordinate(200, 120, 300, 180, 0, 0)
+time.sleep(1.2)
+# 打开末端工具和扩展IO口
+robot_arm.set_robot_end_tool(1, True)
+robot_arm.set_robot_io_status(1, True)
+robot_arm.set_robot_io_status(3, True)
+time.sleep(3)
+# 机械臂回零
+robot_arm.set_robot_arm_home()
+# 关闭末端工具和扩展IO口
+robot_arm.set_robot_end_tool(1, False)
+robot_arm.set_robot_io_status(1, False)
+robot_arm.set_robot_io_status(3, False)
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+机械臂以50%的速度向前伸直到极限位置，之后将第1关节以75%的速度转动45度，再打开4号扩展IO口，最后执行机械臂回零并关闭扩展IO口。,"```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 机械臂以50%的速度向前伸直到极限位置
+degree = [0, 90, -90, 0, -90, 0]
+robot_arm.set_joint_degree_synchronize(*degree, speed_percentage=50)
+time.sleep(1)
+# 第1关节以75%的速度转动45度
+robot_arm.set_joint_degree_by_number(1, 75, 45)
+# 打开4号扩展IO口
+robot_arm.set_robot_io_status(4, True)
+# 机械臂回零
+robot_arm.set_robot_arm_home()
+# 关闭扩展IO口
+robot_arm.set_robot_io_status(4, False)
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+"控制机械臂抓取坐标(200,-120,65,180,0,0)处的物体，再抬升到坐标(200,-120,200,180,0,0)处，之后在坐标(200,120,70,180,0,0)处放下物体，最后执行机械臂回零。","```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 抓取物体
+robot_arm.set_robot_arm_coordinate(200, -120, 65, 180, 0, 0)
+robot_arm.set_robot_end_tool(1, True)
+time.sleep(1)
+# 抬升机械臂
+robot_arm.set_robot_arm_coordinate(200, -120, 200, 180, 0, 0)
+# 在目标点放下物体
+robot_arm.set_robot_arm_coordinate(200, 120, 70, 180, 0, 0)
+time.sleep(1)
+robot_arm.set_robot_end_tool(1, False)
+# 机械臂回零
+robot_arm.set_robot_arm_home()
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+将机械臂第2关节以60%的速度转动-45度，再将第3关节以60%的速度转动45度，最后将机械臂第1关节以50%的速度转动45度后，执行机械臂回零。,"```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 分别执行机械臂关节角度控制
+robot_arm.set_joint_degree_by_number(2, 60, -45)
+robot_arm.set_joint_degree_by_number(3, 60, 45)
+robot_arm.set_joint_degree_by_number(1, 50, 45)
+# 机械臂回零
+robot_arm.set_robot_arm_home()
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+获取当前机械臂各个关节的角度，并将每个关节的角度值增加20，最后执行机械臂回零。,"```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 获取当前机械臂各个关节的角度
+joint_degree_all = robot_arm.get_joint_degree_all().get(""data"")
+print(joint_degree_all)
+# 将每个关节的角度值增加20
+joint_degree_all_new = [degree + 20 for degree in joint_degree_all]
+robot_arm.set_joint_degree_synchronize(*joint_degree_all_new, speed_percentage=50)
+time.sleep(2)
+# 机械臂回零
+robot_arm.set_robot_arm_home()
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+依次打开机械臂的1-4号扩展IO口，每个扩展IO口开启5秒，关闭后再打开下一个扩展IO口。,"```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""""192.168.1.254"""", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 依次打开1-4号扩展IO口
+robot_arm.set_robot_io_status(1, True)
+time.sleep(5)
+robot_arm.set_robot_io_status(1, False)
+robot_arm.set_robot_io_status(2, True)
+time.sleep(5)
+robot_arm.set_robot_io_status(2, False)
+robot_arm.set_robot_io_status(3, True)
+time.sleep(5)
+robot_arm.set_robot_io_status(3, False)
+robot_arm.set_robot_io_status(4, True)
+time.sleep(5)
+robot_arm.set_robot_io_status(4, False)
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+获取机械臂设备当前位置的坐标，在当前坐标位置处画一个边长为10cm的正方形。,"```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 获取机械臂当前位置的坐标
+coordinate_json = robot_arm.get_robot_coordinate()
+coordinate = json.loads(coordinate_json).get(""data"")
+xx, yy, zz, Rx, Ry, Rz = coordinate
+
+# 在当前坐标位置处画一个边长为10cm的正方形
+robot_arm.set_robot_arm_coordinate(xx, yy - 100, zz, Rx, Ry, Rz)
+time.sleep(1)
+robot_arm.set_robot_arm_coordinate(xx - 100, yy - 100, zz, Rx, Ry, Rz)
+time.sleep(1)
+robot_arm.set_robot_arm_coordinate(xx - 100, yy, zz, Rx, Ry, Rz)
+time.sleep(1)
+robot_arm.set_robot_arm_coordinate(xx, yy, zz, Rx, Ry, Rz)
+time.sleep(1)
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+将机械臂向上伸直到极限位置，再将机械臂的第1个关节旋转-120度，最后执行机械臂回零。,"```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 将机械臂向上伸直到极限位置
+robot_arm.set_joint_degree_synchronize(0, 0, -90, 0, 0, -90)
+time.sleep(2)
+# 机械臂第1关节旋转-120度
+robot_arm.set_joint_degree_by_number(1,50,-120)
+# 机械臂回零
+robot_arm.set_robot_arm_home()
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+将机械臂向后收缩至极限位置。,"```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 将机械臂向后收缩至极限位置
+robot_arm.set_joint_degree_synchronize(0, -85, 47, 0, -90, 0)
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+"机械臂末端工具以坐标(244.5，0，268.22，180, 0, 0)为起点，画一个边长为8cm的等边三角形，再执行机械臂回零。","```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 将机械臂末端工具移动到起点坐标处
+coordinate = [244.5，0，268.22，180，0，0]
+robot_arm.set_robot_arm_coordinate(*coordinate, speed_percentage=50)
+time.sleep(1)
+
+# 画一个边长为8cm的等边三角形
+xx, yy, zz, Rx, Ry, Rz = coordinate
+robot_arm.set_robot_arm_coordinate(xx-69.3, yy+40, zz, Rx, Ry, Rz)
+time.sleep(1)
+robot_arm.set_robot_arm_coordinate(xx-69.3, yy-40, zz, Rx, Ry, Rz)
+time.sleep(1)
+robot_arm.set_robot_arm_coordinate(xx, yy, zz, Rx, Ry, Rz)
+time.sleep(1)
+# 机械臂回零
+robot_arm.set_robot_arm_home()
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+"将机械臂末端工具移动至坐标(244.5, 100, 268.22, 180, 0, 0)处，以当前坐标为起点，画一个边长为8cm的等边三角形，获取终点坐标后执行机械臂回零。","```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 将机械臂末端工具移动至起点坐标处
+coordinate = [244.5, 100, 268.22, 180, 0, 0]
+robot_arm.set_robot_arm_coordinate(*coordinate, speed_percentage=50)
+time.sleep(1)
+
+# 画一个边长为8cm的等边三角形
+xx, yy, zz, Rx, Ry, Rz = coordinate
+robot_arm.set_robot_arm_coordinate(xx-69.3,yy+40,zz,Rx,Ry,Rz)
+time.sleep(1)
+robot_arm.set_robot_arm_coordinate(xx-69.3,yy-40,zz,Rx,Ry,Rz)
+time.sleep(1)
+robot_arm.set_robot_arm_coordinate(xx,yy,zz,Rx,Ry,Rz)
+time.sleep(1)
+# 获取终点坐标并执行机械臂回零
+coordinate_json = robot_arm.get_robot_coordinate()
+coordinate = json.loads(coordinate_json).get(""data"")
+print(coordinate)
+robot_arm.set_robot_arm_home()
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+控制机械臂设备跳一段霹雳舞。,"```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 执行舞蹈动作
+robot_arm.set_joint_degree_synchronize(0, 80, -90, 0, -90, 0, speed_percentage=60)
+time.sleep(0.5)
+robot_arm.set_joint_degree_synchronize(0, 80, -90, 0, -180, 0, speed_percentage=100)
+time.sleep(0.5)
+robot_arm.set_joint_degree_synchronize(45, -85, 45, 90, -90, 0, speed_percentage=80)
+time.sleep(0.2)
+robot_arm.set_joint_degree_synchronize(-45, -85, 45, 90, -90, 0, speed_percentage=90)
+time.sleep(0.5)
+robot_arm.set_joint_degree_synchronize(45, 0, -90, 0, -90, 0, speed_percentage=60)
+time.sleep(0.5)
+robot_arm.set_joint_degree_synchronize(-120, 0, -90, 0, -90, 0, speed_percentage=100)
+time.sleep(0.5)
+robot_arm.set_joint_degree_synchronize(0, -80, 45, 0, 0, 0,  speed_percentage=100)
+time.sleep(0.5)
+robot_arm.set_joint_degree_synchronize(-100, -80, 45, 0, 0, 0,  speed_percentage=100)
+time.sleep(0.5)
+robot_arm.set_joint_degree_synchronize(100, -80, 45, 0, 0, 0,  speed_percentage=100)
+time.sleep(0.5)
+robot_arm.set_joint_degree_synchronize(120, 0, -90, 0, -90, 0, speed_percentage=60)
+time.sleep(0.5)
+robot_arm.set_joint_degree_synchronize(-120, 0, -90, 0, -90, 0, speed_percentage=60)
+time.sleep(0.5)
+# 机械臂回零
+robot_arm.set_robot_arm_home()
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+"将机械臂末端工具的坐标设置为(244.5, 0, 65, 180, 0, 0)，打开机械臂的1号末端工具吸取物体，并将物体移动到坐标(244.5, 0, 100, 180, 0, 0)处，再将物体旋转180度后，移动回起点处释放物体，最后执行机械臂回零。","```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 吸取目标物体
+robot_arm.set_robot_arm_coordinate(244.5, 0, 65, 180, 0, 0)
+time.sleep(1)
+robot_arm.set_robot_end_tool(1, True)
+time.sleep(1)
+# 移动到指定位置
+robot_arm.set_robot_arm_coordinate(244.5, 0, 100, 180, 0, 0)
+time.sleep(1)
+# 将物体旋转180度
+robot_arm.set_joint_degree_by_number(6, 60, 180)
+time.sleep(1)
+# 移动回起点位置
+robot_arm.set_robot_arm_coordinate(244.5, 0, 65, 180, 0, 180)
+time.sleep(1)
+# 释放物体
+robot_arm.set_robot_end_tool(1, False)
+# 机械臂回零
+robot_arm.set_robot_arm_home()
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+"将机械臂末端工具的坐标设置为(200, 100, 65, 180, 0, 0)，打开机械臂的1号末端工具吸取物体，然后将物体旋转180度后再移动到坐标(244.5, 0, 65, 180, 0, 180)处，最后释放物体并执行机械臂回零。","```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 吸取目标物体
+robot_arm.set_robot_arm_coordinate(200, 100, 65, 180, 0, 0)
+time.sleep(1)
+robot_arm.set_robot_end_tool(1, True)
+time.sleep(1)
+# 将物体旋转180度
+robot_arm.set_joint_degree_by_number(6, 60, 180)
+time.sleep(1)
+# 移动到指定位置
+robot_arm.set_robot_arm_coordinate(244.5, 0, 65, 180, 0, 180)
+time.sleep(1)
+# 释放物体并执行机械臂回零
+robot_arm.set_robot_end_tool(1, False)
+robot_arm.set_robot_arm_home()
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+将机械臂向后收缩至极限位置，再向前伸直至极限位置，之后打开3号扩展IO口，5秒后执行机械臂回零并关闭扩展IO口。,"```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 机械臂向后收缩至极限位置
+robot_arm.set_joint_degree_synchronize(0, -85, 47, 0, -90, 0)
+time.sleep(1)
+# 向前伸直至极限位置
+robot_arm.set_joint_degree_synchronize(0, 90, -90, 0, -90, 0)
+time.sleep(1)
+# 打开3号扩展IO口
+robot_arm.set_robot_io_status(3, True)
+time.sleep(5)
+# 机械臂回零并关闭扩展IO口
+robot_arm.set_robot_io_status(3, False)
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
+机械臂末端工具以坐标(244.5，75，268.22，180，0，0)为起点，画一个长为6cm，宽为5cm的长方形。,"```python
+# 连接机械臂设备
+socket_communication = SocketCommunication(host=""192.168.1.254"", port=1234)
+robot_arm = RobotArm(socket_communication)
+robot_arm.start_communication()
+
+# 将机械臂末端工具移动至起点坐标处
+coordinate = [244.5, 75, 268.22, 180, 0, 0]
+robot_arm.set_robot_arm_coordinate(*coordinate, speed_percentage=50)
+time.sleep(1)
+
+# 画一个长为6cm，宽为5cm的长方形
+xx, yy, zz, Rx, Ry, Rz = coordinate
+robot_arm.set_robot_arm_coordinate(xx, yy-60, zz, Rx, Ry, Rz)
+time.sleep(1)
+robot_arm.set_robot_arm_coordinate(xx-50, yy-60, zz, Rx, Ry, Rz)
+time.sleep(1)
+robot_arm.set_robot_arm_coordinate(xx-50, yy, zz, Rx, Ry, Rz)
+time.sleep(1)
+robot_arm.set_robot_arm_coordinate(xx , yy, zz, Rx, Ry, Rz)
+# 机械臂回零
+ robot_arm.set_robot_arm_home()
+
+# 断开与机械臂设备的连接
+robot_arm.end_communication()
+```"
